@@ -1,0 +1,44 @@
+# IDE and Editor folders
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Logs and temporary files
+*.log
+tmp/
+temp/
+.tmp/
+*.bak
+*.swp
+
+# Build / Output directories (if applicable)
+build/
+dist/
+out/
+
+# Gemini / Agent data
+.gemini/
+.agents/
+
+# Python environments (if you use scripts around Overpy)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env/
+.venv/
