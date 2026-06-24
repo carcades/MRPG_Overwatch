@@ -2,15 +2,14 @@
 
 rule "Exit blood shop":
     @Event eachPlayer
-    @Condition eventPlayer.in_blood_shop == true
+    @Condition eventPlayer.current_zone == Zone.BLOOD_SHOP
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     @Condition distance(eventPlayer.getPosition(), exit_blood_shop_pos) <= 1
     
-    #wait(0.1, Wait.ABORT_WHEN_FALSE)
     eventPlayer.teleport(vect(136.405, 64.078, -167.114))
     eventPlayer.setInvisibility(Invis.NONE)
     eventPlayer.clearStatusEffect(Status.HACKED)
-    eventPlayer.in_blood_shop = false
+    eventPlayer.current_zone = Zone.NONE
 
 
 rule "Enter blood shop":
@@ -18,16 +17,16 @@ rule "Enter blood shop":
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     @Condition distance(eventPlayer.getPosition(), enter_blood_shop_pos) <= 1
     
-    #wait(0.1, Wait.ABORT_WHEN_FALSE)
     eventPlayer.teleport(vect(136.175, 63.946, -175.165))
     eventPlayer.setInvisibility(Invis.ALL)
-    eventPlayer.setStatusEffect(null, Status.HACKED, 9999)
-    eventPlayer.in_blood_shop = true
+    playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.RED, eventPlayer.getPosition(), 100)
+    eventPlayer.current_zone = Zone.BLOOD_SHOP
+    wait(1)
 
 
-rule "Blood wall":
+rule "Blood shop wall":
     @Event eachPlayer
-    @Condition eventPlayer.in_blood_shop == true
+    @Condition eventPlayer.current_zone == Zone.BLOOD_SHOP
     @Condition distance(eventPlayer.getPosition(), wall_blood_shop_pos) <= 4
     @Disabled
     
@@ -39,18 +38,18 @@ rule "Blood wall":
 
 rule "Blood buy vampire":
     @Event eachPlayer
-    @Condition eventPlayer.in_blood_shop == true
+    @Condition eventPlayer.current_zone == Zone.BLOOD_SHOP
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     @Condition distance(buy_blood_vampire_pos, eventPlayer.getPosition()) <= 1
     @Condition eventPlayer.blood_points >= eventPlayer.vampire_cost
     
-    if eventPlayer.vampire_level < 3:
-        if eventPlayer.passive_vampire == false:
-            eventPlayer.vampire_size = 0.2
-            eventPlayer.passive_vampire = true
-        elif eventPlayer.passive_vampire == true:
-            eventPlayer.vampire_size += 0.2
-        eventPlayer.vampire_level++
+    if eventPlayer.vampireLevel < 3:
+        if eventPlayer.passiveVampire == false:
+            eventPlayer.vampireSize = 0.2
+            eventPlayer.passiveVampire = true
+        elif eventPlayer.passiveVampire == true:
+            eventPlayer.vampireSize += 0.2
+        eventPlayer.vampireLevel++
         eventPlayer.blood_points -= eventPlayer.vampire_cost
     else:
         smallMessage(eventPlayer, "you reached the limit vampire")
@@ -58,30 +57,30 @@ rule "Blood buy vampire":
 
 rule "Blood buy bleeding":
     @Event eachPlayer
-    @Condition eventPlayer.in_blood_shop == true
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
+    @Condition eventPlayer.current_zone == Zone.BLOOD_SHOP
     @Condition distance(buy_bleeding_blood_pos, eventPlayer.getPosition()) <= 1
     @Condition eventPlayer.blood_points >= eventPlayer.bleeding_cost
     
-    if eventPlayer.bleeding_level < 3:
-        if eventPlayer.bleeding_passive == false:
-            eventPlayer.bleeding_power = 0.6
-            eventPlayer.bleeding_duration = 5
-            eventPlayer.bleeding_chance_player = 1
-            eventPlayer.bleeding_passive = true
+    if eventPlayer.bleedingLevel < 3:
+        if eventPlayer.bleedingPassive == false:
+            eventPlayer.bleedingPower = 0.6
+            eventPlayer.bleedingDuration = 5
+            eventPlayer.bleedingChancePlayer = 1
+            eventPlayer.bleedingPassive = true
         else:
-            eventPlayer.bleeding_duration++
-            eventPlayer.bleeding_power += 0.3
-            eventPlayer.bleeding_chance_player++
+            eventPlayer.bleedingDuration++
+            eventPlayer.bleedingPower += 0.3
+            eventPlayer.bleedingChancePlayer++
         eventPlayer.blood_points -= eventPlayer.bleeding_cost
-        eventPlayer.bleeding_level++
+        eventPlayer.bleedingLevel++
     else:
         smallMessage(eventPlayer, "you reached the limit bleeding")
 
 
 rule "Blood buy xp boost":
     @Event eachPlayer
-    @Condition eventPlayer.in_blood_shop == true
+    @Condition eventPlayer.current_zone == Zone.BLOOD_SHOP
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     @Condition distance(buy_blood_xp_multi_pos, eventPlayer.getPosition()) <= 1
     @Condition eventPlayer.blood_points >= eventPlayer.blood_xp_cost
@@ -91,3 +90,13 @@ rule "Blood buy xp boost":
         eventPlayer.blood_points -= eventPlayer.blood_xp_cost
     else:
         smallMessage(eventPlayer, "you have reached the blood xp multipy limit")
+
+rule "Blood shop heal passive":
+    @Event eachPlayer
+    @Condition eventPlayer.current_zone == Zone.BLOOD_SHOP
+    @Condition eventPlayer.getHealth() < eventPlayer.getMaxHealth()
+
+    heal(eventPlayer, null, 1)
+    wait(1)
+    if ruleCondition:
+        loop()

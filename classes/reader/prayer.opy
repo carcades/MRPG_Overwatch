@@ -4,9 +4,7 @@ rule "Reader Ability: prayer for salvation":
     @Event eachPlayer
     #@Condition eventPlayer.readerAbilities == true
     @Condition eventPlayer.isHoldingButton(Button.ULTIMATE) == true
-    @Condition eventPlayer.in_altar == false
-    @Condition eventPlayer.in_underground == false
-    @Condition eventPlayer.in_blood_shop == false
+    @Condition eventPlayer.current_zone == Zone.NONE
     
     if eventPlayer.isAlive() == false or eventPlayer.prayerCanCastMoving == false and eventPlayer.isMoving():
         smallMessage(eventPlayer, "you cant say a prayer if you die or in motion")

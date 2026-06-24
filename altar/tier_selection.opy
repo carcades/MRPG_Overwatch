@@ -2,7 +2,7 @@
 
 rule "Update description visibility status":
     @Event eachPlayer
-    @Condition eventPlayer.in_altar == true
+    @Condition eventPlayer.current_zone == Zone.ALTAR
     
     if eventPlayer.isHoldingButton(Button.CROUCH) == true:
         eventPlayer.description_visibility_status = 1
@@ -15,7 +15,7 @@ rule "Update description visibility status":
 
 rule ">>>>>> Selection Tier-2 Race <<<<<<":
     @Event eachPlayer
-    @Condition eventPlayer.in_altar == true
+    @Condition eventPlayer.current_zone == Zone.ALTAR
     @Condition eventPlayer.altar_status == AltarStatus.TIER_2_SELECTION
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     
@@ -25,16 +25,16 @@ rule ">>>>>> Selection Tier-2 Race <<<<<<":
         wait(5, Wait.ABORT_WHEN_FALSE)
         eventPlayer.altar_status = AltarStatus.READER
         eventPlayer.current_race = ["Reader", 2, rgb(125, 155, 235), eventPlayer]
-        # reader data: [abilities, prayer_iter, holy_circle_iter, holy_circle_iter_plus, 
-        #               salv_progress, salv_cast_dur, salv_can_cast_moving, salv_is_active, salv_speed_bonus, salv_duration, salv_original_cast_dur, salv_sound,
-        #               cour_progress, cour_cast_dur, cour_can_cast_moving, cour_added_dmg_received, cour_added_damage, cour_duration, cour_original_cast_dur, cour_sound]
-        eventPlayer.reader_data = [true, 0, 0, 0, 0, 0, false, false, 0, 0, 0, null, 0, 0, false, 0, 0, 0, 0, null]
+        # angelic branch data: [abilities, prayer_iter, holy_circle_iter, holy_circle_iter_plus, 
+        #                       salv_progress, salv_cast_dur, salv_can_cast_moving, salv_is_active, salv_speed_bonus, salv_duration, salv_original_cast_dur, salv_sound,
+        #                       cour_progress, cour_cast_dur, cour_can_cast_moving, cour_added_dmg_received, cour_added_damage, cour_duration, cour_original_cast_dur, cour_sound]
+        eventPlayer.branch_data = [true, 0, 0, 0, 0, 0, false, false, 0, 0, 0, null, 0, 0, false, 0, 0, 0, 0, null]
         
-        # nested arrays initialized in separate variables
-        eventPlayer.reader_prayer_hud_ids = [null, null]
-        eventPlayer.reader_prayer_active_effects = []
-        eventPlayer.reader_courage_hud_ids = [null, null]
-        eventPlayer.reader_courage_active_effects = []
+        # nested arrays
+        eventPlayer.branch_t1_hud_ids = [null, null]
+        eventPlayer.branch_t1_active_effects = []
+        eventPlayer.branch_t2_hud_ids = [null, null]
+        eventPlayer.branch_t2_active_effects = []
         disable_altar_effects()
         race_change_tp()
     #get demon worshiper race

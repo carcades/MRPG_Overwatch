@@ -16,7 +16,7 @@ def update_emrld_economic_parameters():
 
 rule "buy emeralds":
     @Event eachPlayer
-    @Condition eventPlayer.in_underground == true
+    @Condition eventPlayer.current_zone == Zone.UNDERGROUND
     @Condition distance(eventPlayer.getPosition(), vect(buy_emeralds_pos.x, buy_emeralds_pos.y - 1, buy_emeralds_pos.z)) <= 1
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     
@@ -40,7 +40,7 @@ rule "buy emeralds":
 
 rule "sell emeralds":
     @Event eachPlayer
-    @Condition eventPlayer.in_underground == true
+    @Condition eventPlayer.current_zone == Zone.UNDERGROUND
     @Condition distance(eventPlayer.getPosition(), vect(sell_emeralds_pos.x, sell_emeralds_pos.y - 1, sell_emeralds_pos.z)) <= 1
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     

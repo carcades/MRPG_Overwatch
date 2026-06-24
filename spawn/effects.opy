@@ -4,7 +4,7 @@ rule "Spawn effects":
     wait(3)
     #spawn bubble
     createEffect(getAllPlayers(), Effect.SPHERE, Color.ORANGE, vect(spawn_bubble_position.x, spawn_bubble_position.y - 1, spawn_bubble_position.z), 46, EffectReeval.NONE)
-    createInWorldText(getAllPlayers().filter(lambda _: localPlayer.in_bubble == true), "ctrl + f to fast buy\r\n1 level up point to buy", spawn_description_pos, 1.5, Clip.SURFACES, WorldTextReeval.VISIBILITY)
+    createInWorldText(getAllPlayers().filter(lambda _: localPlayer.current_zone == Zone.BUBBLE), "ctrl + f to fast buy\r\n1 level up point to buy", spawn_description_pos, 1.5, Clip.SURFACES, WorldTextReeval.VISIBILITY)
     #stats shop
     createEffect(getAllPlayers(), Effect.RING, Color.RED, vect(buy_damage_pos.x, buy_damage_pos.y + -1, buy_damage_pos.z), 1, EffectReeval.NONE)
     createEffect(getAllPlayers(), Effect.RING, Color.GREEN, vect(buy_health_pos.x, buy_health_pos.y + -1, buy_health_pos.z), 1, EffectReeval.NONE)

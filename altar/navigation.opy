@@ -2,7 +2,7 @@
 
 rule "Enter altar":
     @Event eachPlayer
-    @Condition eventPlayer.in_bubble == true
+    @Condition eventPlayer.current_zone == Zone.BUBBLE
     @Condition distance(eventPlayer.getPosition(), vect(enter_altar_pos.x, enter_altar_pos.y - 1, enter_altar_pos.z)) < 1.3
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     
@@ -15,21 +15,21 @@ rule "Enter altar":
             eventPlayer.altar_status = AltarStatus.TIER_2_SELECTION
             enable_display_tier_2_effects()
             eventPlayer.teleport(teleport_to_altar_point)
-            eventPlayer.in_altar = true
+            eventPlayer.current_zone = Zone.ALTAR
     elif eventPlayer.altar_status == AltarStatus.TIER_2_SELECTION:
         smallMessage(eventPlayer, "hold f 1 sec to enter")
         wait(1, Wait.ABORT_WHEN_FALSE)
         enable_display_tier_2_effects()
         eventPlayer.teleport(teleport_to_altar_point)
-        eventPlayer.in_altar = true
+        eventPlayer.current_zone = Zone.ALTAR
 
 
 rule "Exit altar":
     @Event eachPlayer
-    @Condition eventPlayer.in_altar == true
+    @Condition eventPlayer.current_zone == Zone.ALTAR
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     @Condition distance(eventPlayer.getPosition(), vect(exit_altar_point.x, exit_altar_point.y - 2, exit_altar_point.z)) <= 1.3
     
     eventPlayer.teleport(respawn_point)
-    eventPlayer.in_altar = false
+    eventPlayer.current_zone = Zone.NONE
     disable_altar_effects()

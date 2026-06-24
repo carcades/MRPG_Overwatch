@@ -7,6 +7,14 @@
 
 # ===== Enumerations =====
 
+enum Zone:
+    NONE = 0,
+    BUBBLE,
+    BLOOD_SHOP,
+    EMERALD_MINE,
+    ALTAR,
+    UNDERGROUND
+
 enum AltarStatus:
     NONE = 0,
     TIER_2_SELECTION,

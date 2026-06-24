@@ -11,12 +11,10 @@ rule "Get Emerald":
     update_emrld_economic_parameters()
 
 
-rule "Emerald mining":
+rule "Mining start":
     @Event eachPlayer
-    @Condition eventPlayer.player_init == true
-    @Condition eventPlayer.is_selection_hero == false
-    @Condition eventPlayer.in_emerald_mine == true
-    #@Condition eventPlayer.isHoldingButton(Button.CROUCH) == true
+    @Condition eventPlayer.current_zone == Zone.EMERALD_MINE
+    @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     @Condition eventPlayer.isAlive() == true
     
     eventPlayer.emerald_mining_progress++
@@ -25,15 +23,15 @@ rule "Emerald mining":
         loop()
 
 
-rule "Player enter emerald mine":
+rule "Enter emerald mine area":
     @Event eachPlayer
-    @Condition distance(eventPlayer.getPosition(), emerald_mine_cord) <= 4
+    @Condition distance(eventPlayer.getPosition(), emerald_mine_cord) <= 2
     
-    eventPlayer.in_emerald_mine = true
+    eventPlayer.current_zone = Zone.EMERALD_MINE
 
 
-rule "Player leave emerald mine":
+rule "Leave emerald mine area":
     @Event eachPlayer
-    @Condition distance(eventPlayer.getPosition(), emerald_mine_cord) > 4
+    @Condition distance(eventPlayer.getPosition(), emerald_mine_cord) > 2
     
-    eventPlayer.in_emerald_mine = false
+    eventPlayer.current_zone = Zone.UNDERGROUND
