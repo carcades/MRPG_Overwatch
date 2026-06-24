@@ -22,6 +22,7 @@ rule "bot respawn":
 
 
 rule "teleport":
+    @Disabled
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.MELEE) == true
     
@@ -32,12 +33,14 @@ rule "teleport":
 
 
 rule "effects":
+    @Disabled
     @Event eachPlayer
     
     #createEffect(getAllPlayers(), Effect.SPHERE, Color.WHITE, updateEveryFrame(eventPlayer.getEyePosition()), 0.2, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
 
 
 rule "Правило 100":
+    @Disabled
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.ULTIMATE) == true
     
@@ -47,6 +50,7 @@ rule "Правило 100":
 
 
 rule "Правило 88":
+    @Disabled
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.CROUCH) == true
     @Disabled
@@ -55,6 +59,7 @@ rule "Правило 88":
 
 
 rule "Правило 89":
+    @Disabled
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE) == true
     @Disabled
@@ -64,10 +69,12 @@ rule "Правило 89":
 
 
 rule "Правило 93":
+    @Disabled
     hudHeader(getAllPlayers(), "{0}".format(len(effects_to_be_destroyed_array)), HudPosition.LEFT, 100, Color.WHITE, HudReeval.VISIBILITY_AND_STRING)
 
 
 rule "Правило 96":
+    @Disabled
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.SECONDARY_FIRE) == true
     
@@ -75,6 +82,7 @@ rule "Правило 96":
 
 
 rule "Правило 97":
+    @Disabled
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.PRIMARY_FIRE) == true
     
@@ -85,6 +93,7 @@ rule "Правило 97":
 
 
 rule "Правило 98":
+    @Disabled
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     
@@ -92,6 +101,7 @@ rule "Правило 98":
 
 
 rule "Правило 99":
+    @Disabled
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.JUMP) == true
     
@@ -103,6 +113,7 @@ rule "Правило 99":
 
 
 rule "Правило 100":
+    @Disabled
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.CROUCH) == true
     

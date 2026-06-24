@@ -25,13 +25,16 @@ rule ">>>>>> Selection Tier-2 Race <<<<<<":
         wait(5, Wait.ABORT_WHEN_FALSE)
         eventPlayer.altar_status = AltarStatus.READER
         eventPlayer.current_race = ["Reader", 2, rgb(125, 155, 235), eventPlayer]
-        #reader prayer of salvation: [casting_progress, [prayer_hud_progress_id, prayer_in-world_progress_id], speed_prayer_casting,
-        #start_cast_pos, casting_in_motion, has_pr_effects, added_to_speed, duration_of_prayer_fight_effects, speed_casting_duplicat, sound]
-        eventPlayer.reader_prayer_of_salvation = [0, [null, null], null, null, false, false, null, null, null, null, null]
-        #reader prayer of salvation: [prayer_progress, [prayer_hud_progress_id, prayer_in-world_progress_id], speed_prayer_casting,
-        #start_cast_pos, casting_in_motion, added_to_dmg_received, added_to_damage, duration_of_prayer_fight_effects, speed_casting_duplicat]
-        eventPlayer.reader_prayer_for_courage = [0, [null, null], null, null, false, null, null, null, null]
-        eventPlayer.reader_abilities = true
+        # reader data: [abilities, prayer_iter, holy_circle_iter, holy_circle_iter_plus, 
+        #               salv_progress, salv_cast_dur, salv_can_cast_moving, salv_is_active, salv_speed_bonus, salv_duration, salv_original_cast_dur, salv_sound,
+        #               cour_progress, cour_cast_dur, cour_can_cast_moving, cour_added_dmg_received, cour_added_damage, cour_duration, cour_original_cast_dur, cour_sound]
+        eventPlayer.reader_data = [true, 0, 0, 0, 0, 0, false, false, 0, 0, 0, null, 0, 0, false, 0, 0, 0, 0, null]
+        
+        # nested arrays initialized in separate variables
+        eventPlayer.reader_prayer_hud_ids = [null, null]
+        eventPlayer.reader_prayer_active_effects = []
+        eventPlayer.reader_courage_hud_ids = [null, null]
+        eventPlayer.reader_courage_active_effects = []
         disable_altar_effects()
         race_change_tp()
     #get demon worshiper race

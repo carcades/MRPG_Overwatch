@@ -2,7 +2,7 @@
 
 rule "Reader Ability: prayer for salvation":
     @Event eachPlayer
-    #@Condition eventPlayer.reader_abilities == true
+    #@Condition eventPlayer.readerAbilities == true
     @Condition eventPlayer.isHoldingButton(Button.ULTIMATE) == true
     @Condition eventPlayer.in_altar == false
     @Condition eventPlayer.in_underground == false
@@ -13,7 +13,7 @@ rule "Reader Ability: prayer for salvation":
         wait(0.5)
     #start casting the prayer 
     else:
-        create_reader_holy_circle()
+        #create_reader_holy_circle()
         #speed of casting parayer
         eventPlayer.prayerCastDuration = 30 - ((eventPlayer.current_tier - 1) * 5 if eventPlayer.current_tier <= 5 else 20)
         eventPlayer.prayerOriginalCastDur = eventPlayer.prayerCastDuration
@@ -26,7 +26,8 @@ rule "Reader Ability: prayer for salvation":
         eventPlayer.prayerSoundEffectId = getLastCreatedEntity()
         #if player can casting the prayer in motion
         if eventPlayer.prayerCanCastMoving == true:
-            for eventPlayer.reader_prayer_iter in range(eventPlayer.prayerCastDuration):
+            eventPlayer.readerPrayerIter = 0
+            while eventPlayer.readerPrayerIter < eventPlayer.prayerCastDuration:
                 if eventPlayer.isAlive() == true:
                     eventPlayer.prayerProgress++
                     wait(0.25)
@@ -34,9 +35,11 @@ rule "Reader Ability: prayer for salvation":
                     smallMessage(eventPlayer, "the recitation of the prayer has been discontinued")
                     eventPlayer.prayerCastDuration = 0
                     break
+                eventPlayer.readerPrayerIter++
         #if player cant casting prayer in motion
         else:
-            for eventPlayer.reader_prayer_iter in range(eventPlayer.prayerCastDuration):
+            eventPlayer.readerPrayerIter = 0
+            while eventPlayer.readerPrayerIter < eventPlayer.prayerCastDuration:
                 if eventPlayer.isAlive() == true and eventPlayer.isMoving() == false:
                     wait(0.25)
                     eventPlayer.prayerProgress++
@@ -44,8 +47,9 @@ rule "Reader Ability: prayer for salvation":
                     smallMessage(eventPlayer, "the recitation of the prayer has been discontinued")
                     eventPlayer.prayerCastDuration = 0
                     break
+                eventPlayer.readerPrayerIter++
         #destroy prayer casting effects
-        destroy_reader_holy_circle()
+        #destroy_reader_holy_circle()
         destroyEffect(eventPlayer.prayerSoundEffectId)
         destroyProgressBarHud(eventPlayer.prayerHudBarId)
         destroyProgressBarInWorldText(eventPlayer.prayerWorldBarId)

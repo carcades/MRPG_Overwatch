@@ -63,12 +63,11 @@ playervar altar_left_1_ring 64
 playervar altar_left_2_ring 65
 playervar altar_right_1_ring 67
 playervar reader_holy_circle_effects 70
-playervar reader_abilities 71
-playervar reader_prayer_iter 72
-playervar reader_holy_circle_iter 73
-playervar reader_holy_circle_iter_plus 74
-playervar reader_prayer_of_salvation 75
-playervar reader_prayer_for_courage 76
+playervar reader_data 71
+playervar reader_prayer_hud_ids 72
+playervar reader_prayer_active_effects 73
+playervar reader_courage_hud_ids 74
+playervar reader_courage_active_effects 75
 playervar temp_array 80
 playervar index_of_etbda_object 81
 playervar temp_var_0 82
