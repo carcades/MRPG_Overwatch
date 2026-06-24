@@ -31,5 +31,5 @@ rule "Exit altar":
     @Condition distance(eventPlayer.getPosition(), vect(exit_altar_point.x, exit_altar_point.y - 2, exit_altar_point.z)) <= 1.3
     
     eventPlayer.teleport(respawn_point)
-    eventPlayer.current_zone = Zone.NONE
+    eventPlayer.current_zone = Zone.BUBBLE
     disable_altar_effects()

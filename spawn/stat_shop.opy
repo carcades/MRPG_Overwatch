@@ -11,7 +11,7 @@ rule "Shop buy damage":
             eventPlayer.stat_damage++
             eventPlayer.level_up_points--
             eventPlayer.setDamageDealt(eventPlayer.stat_damage)
-            wait()
+            wait(0.016)
             if ruleCondition:
                 loop()
         else:
@@ -33,7 +33,7 @@ rule "Shop buy health":
             eventPlayer.stat_health++
             eventPlayer.level_up_points--
             eventPlayer.setMaxHealth(eventPlayer.stat_health)
-            wait()
+            wait(0.016)
             if ruleCondition:
                 loop()
         else:
@@ -55,7 +55,7 @@ rule "Shop buy speed":
             eventPlayer.stat_speed += 0.25
             eventPlayer.level_up_points--
             eventPlayer.setMoveSpeed(eventPlayer.stat_speed)
-            wait()
+            wait(0.016)
             if ruleCondition:
                 loop()
         else:

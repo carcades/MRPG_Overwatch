@@ -56,6 +56,7 @@ rule "Player Init":
     eventPlayer.altar_left_1_ring = [rgb(0, 0, 0), false]
     eventPlayer.altar_left_2_ring = [rgb(0, 0, 0), false]
     #player init = true
+    eventPlayer.current_zone = Zone.NONE
     eventPlayer.player_init = true
 
 

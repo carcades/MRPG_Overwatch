@@ -62,19 +62,19 @@ rule "Reader Ability: prayer for salvation":
                 playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.BLUE, eventPlayer, 8)
                 createEffect(getAllPlayers(), Effect.ANA_NANO_BOOSTED, Color.TEAM_2, eventPlayer, 200, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
                 #add effects to effects_to_be_destroyed_array
-                effects_array_append_args = [getLastCreatedEntity(), getTotalTimeElapsed() + eventPlayer.prayerDuration, "entity"]
+                effects_array_append_args = [getLastCreatedEntity(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.ENTITY]
                 append_to_del_effects_array()
                 eventPlayer.prayerActiveEffects = [effects_array_append_args]
                 #add health pool 
                 eventPlayer.addHealthPool(Health.SHIELDS, eventPlayer.getMaxHealth() / 3, true, false)
                 #add health pool to effects_to_be_destroyed_array
-                effects_array_append_args = [getLastCreatedHealthPool(), getTotalTimeElapsed() + eventPlayer.prayerDuration, "health_bar"]
+                effects_array_append_args = [getLastCreatedHealthPool(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.HEALTH_BAR]
                 append_to_del_effects_array()
                 eventPlayer.prayerActiveEffects.append(effects_array_append_args)
                 #heal over time
                 eventPlayer.startHealingOverTime(eventPlayer, 100000000, eventPlayer.getMaxHealth() / 5 + ((eventPlayer.current_tier - 1) * 10))
                 #add heal over time to effects_to_be_destroyed_array
-                effects_array_append_args = [getLastHealingOverTimeId(), getTotalTimeElapsed() + eventPlayer.prayerDuration, "heal_over_time"]
+                effects_array_append_args = [getLastHealingOverTimeId(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.HEAL_OVER_TIME]
                 append_to_del_effects_array()
                 eventPlayer.prayerActiveEffects.append(effects_array_append_args)
                 #add speed
@@ -82,13 +82,13 @@ rule "Reader Ability: prayer for salvation":
                 eventPlayer.stat_speed += eventPlayer.prayerSpeedBonus
                 eventPlayer.setMoveSpeed(eventPlayer.stat_speed)
                 #add speed to effects_to_be_destroyed_array
-                effects_array_append_args = [eventPlayer, getTotalTimeElapsed() + eventPlayer.prayerDuration, "speed", "subtract", eventPlayer.prayerSpeedBonus]
+                effects_array_append_args = [eventPlayer, getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.SPEED, EffectAction.SUBTRACT, eventPlayer.prayerSpeedBonus]
                 smallMessage(eventPlayer, "prayer duration: {0}".format(eventPlayer.prayerDuration))
                 append_to_del_effects_array()
                 eventPlayer.prayerActiveEffects.append(effects_array_append_args)
                 #player has prayer effects = True
                 eventPlayer.prayerIsActive = true
-                effects_array_append_args = [eventPlayer, getTotalTimeElapsed() + eventPlayer.prayerDuration, "player_variable", "existence_prayer_of_salvation"]
+                effects_array_append_args = [eventPlayer, getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.PLAYER_VARIABLE, EffectAction.EXISTENCE_PRAYER_OF_SALVATION]
                 append_to_del_effects_array()
                 eventPlayer.prayerActiveEffects.append(effects_array_append_args)
             # if player already has praeyr effects 
@@ -109,7 +109,7 @@ rule "Reader Ability: prayer for salvation":
 
                 # stack health pool [1]
                 eventPlayer.addHealthPool(Health.SHIELDS, eventPlayer.getMaxHealth() / 3, true, false)
-                effects_array_append_args = [getLastCreatedHealthPool(), getTotalTimeElapsed() + eventPlayer.prayerDuration, "health_bar"]
+                effects_array_append_args = [getLastCreatedHealthPool(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.HEALTH_BAR]
                 append_to_del_effects_array()
 
                 # extension prayer heal over time [2]

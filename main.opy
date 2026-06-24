@@ -3,7 +3,7 @@
 # =============================================
 # Кастомный RPG-режим для Overwatch Workshop.
 # Код организован в модульную структуру через #!include.
-# Для компиляции используйте OverPy (VS Code extension).
+# Для компиляции используйте OverPy (VS Code extension).                
 
 # --- Settings & Extensions ---
 #!include "settings/extensions.opy"

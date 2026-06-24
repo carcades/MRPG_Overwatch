@@ -24,3 +24,16 @@ enum AltarStatus:
 enum EmeraldCostVector:
     UP_PRICE = 0,
     DOWN_PRICE
+
+enum EffectType:
+    ENTITY = 0,
+    HEALTH_BAR,
+    HEAL_OVER_TIME,
+    PLAYER_VARIABLE,
+    SPEED,
+    DAMAGE,
+    HEALTH
+
+enum EffectAction:
+    SUBTRACT = 0,
+    EXISTENCE_PRAYER_OF_SALVATION

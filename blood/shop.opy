@@ -9,7 +9,7 @@ rule "Exit blood shop":
     eventPlayer.teleport(vect(136.405, 64.078, -167.114))
     eventPlayer.setInvisibility(Invis.NONE)
     eventPlayer.clearStatusEffect(Status.HACKED)
-    eventPlayer.current_zone = Zone.NONE
+    eventPlayer.current_zone = Zone.BUBBLE
 
 
 rule "Enter blood shop":
