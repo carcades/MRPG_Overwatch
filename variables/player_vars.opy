@@ -76,3 +76,7 @@ playervar test_arr_2 93
 playervar test_arr_3 94
 playervar test_arr_4 95
 playervar test_arr_5 96
+playervar hud_buff_names 97
+playervar hud_buff_colors 98
+playervar hud_buff_expires 99
+playervar hud_buff_ids 100

@@ -24,6 +24,14 @@ def extend_buff():
             logToInspector("LIFECYCLE: Extended buff ID {0} at index {1}. New exp: {2}".format(eventPlayer.active_buff_ids[eventPlayer.temp_var_1], eventPlayer.temp_var_1, eventPlayer.buff_append_args[1]))
         eventPlayer.temp_var_2++
         wait(0.016)
+        
+    eventPlayer.temp_var_2 = 0
+    while eventPlayer.temp_var_2 < len(eventPlayer.hud_buff_ids):
+        if eventPlayer.hud_buff_ids[eventPlayer.temp_var_2] in eventPlayer.buff_append_args[0]:
+            eventPlayer.hud_buff_expires[eventPlayer.temp_var_2] = eventPlayer.buff_append_args[1]
+        eventPlayer.temp_var_2++
+        wait(0.016)
+        
     if eventPlayer.temp_var_1 == -1:
         logToInspector("LIFECYCLE: No buffs found from requested IDs.")
 
@@ -83,6 +91,33 @@ rule "Process player buffs":
             logToInspector("LIFECYCLE: active_buffs count is now: {0}".format(len(eventPlayer.active_buff_ids)))
             eventPlayer.index_of_etbda_object--
         eventPlayer.index_of_etbda_object++
+        wait(0.016)
+    wait(0.2)
+    if ruleCondition:
+        loop()
+
+
+def add_hud_buff():
+    @Name "Sub: Add HUD buff to player"
+    eventPlayer.buff_append_args[0].hud_buff_expires.append(eventPlayer.buff_append_args[1])
+    eventPlayer.buff_append_args[0].hud_buff_names.append(eventPlayer.buff_append_args[2])
+    eventPlayer.buff_append_args[0].hud_buff_colors.append(eventPlayer.buff_append_args[3])
+    eventPlayer.buff_append_args[0].hud_buff_ids.append(eventPlayer.buff_append_args[4])
+
+
+rule "Process HUD buffs":
+    @Event eachPlayer
+    @Condition len(eventPlayer.hud_buff_names) >= 1
+    
+    eventPlayer.temp_var_1 = 0
+    while eventPlayer.temp_var_1 < len(eventPlayer.hud_buff_names):
+        if getTotalTimeElapsed() >= eventPlayer.hud_buff_expires[eventPlayer.temp_var_1]:
+            del eventPlayer.hud_buff_names[eventPlayer.temp_var_1]
+            del eventPlayer.hud_buff_colors[eventPlayer.temp_var_1]
+            del eventPlayer.hud_buff_expires[eventPlayer.temp_var_1]
+            del eventPlayer.hud_buff_ids[eventPlayer.temp_var_1]
+            eventPlayer.temp_var_1--
+        eventPlayer.temp_var_1++
         wait(0.016)
     wait(0.2)
     if ruleCondition:

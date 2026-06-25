@@ -66,6 +66,8 @@ rule "Reader Ability: prayer for salvation":
             if eventPlayer.prayerIsActive == false:
                 eventPlayer.buff_append_args = [BuffId.PRAYER_ACTIVE_FLAG, eventPlayer, getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.PLAYER_VARIABLE, EffectAction.EXISTENCE_PRAYER_OF_SALVATION]
                 add_buff()
+                eventPlayer.buff_append_args = [eventPlayer, getTotalTimeElapsed() + eventPlayer.prayerDuration, "{0} prayer of salvation".format(iconString(Icon.HALO)), Color.AQUA, BuffId.PRAYER_ACTIVE_FLAG]
+                add_hud_buff()
 
             #if stacks not exceeded max (2 + tier)
             if eventPlayer.salvationStacks < (2 + eventPlayer.current_tier):

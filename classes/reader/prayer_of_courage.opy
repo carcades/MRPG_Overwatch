@@ -66,6 +66,8 @@ rule "Reader Ability: prayer of courage":
             if eventPlayer.courageIsActive == false:
                 eventPlayer.buff_append_args = [BuffId.COURAGE_ACTIVE_FLAG, eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.PLAYER_VARIABLE, EffectAction.EXISTENCE_PRAYER_OF_COURAGE]
                 add_buff()
+                eventPlayer.buff_append_args = [eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, "{0} prayer of courage".format(iconString(Icon.FIRE)), Color.YELLOW, BuffId.COURAGE_ACTIVE_FLAG]
+                add_hud_buff()
 
             #if stacks not exceeded max (2 + tier)
             if eventPlayer.courageStacks < (2 + eventPlayer.current_tier):

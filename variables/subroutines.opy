@@ -14,3 +14,4 @@ subroutine destroy_reader_holy_circle 13
 subroutine tier_up_reset 14
 subroutine add_buff 15
 subroutine extend_buff 16
+subroutine add_hud_buff 17
