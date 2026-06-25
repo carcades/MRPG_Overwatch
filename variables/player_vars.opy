@@ -71,3 +71,8 @@ playervar active_buff_types 89
 playervar active_buff_actions 90
 playervar active_buff_values 91
 playervar buff_append_args 86
+playervar test_arr_1 92
+playervar test_arr_2 93
+playervar test_arr_3 94
+playervar test_arr_4 95
+playervar test_arr_5 96

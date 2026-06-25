@@ -118,3 +118,58 @@ rule "Правило 100":
     @Condition eventPlayer.isHoldingButton(Button.CROUCH) == true
     
     #hudHeader(getAllPlayers(), "{0} {1} {2} <0>".format(effects_to_be_destroyed_array[0][EffectEntry.TARGET], effects_to_be_destroyed_array[0][EffectEntry.EXPIRE_TIME], effects_to_be_destroyed_array[0][EffectEntry.TYPE]), HudPosition.LEFT, 0, Color.WHITE, HudReeval.VISIBILITY)
+
+rule "Test 5D Array Mechanics":
+    @Event eachPlayer
+    @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
+    @Condition eventPlayer.isHoldingButton(Button.RELOAD) == true
+    
+    # --- ЭКСПЕРИМЕНТ 0: Инициализация ---
+    # Создаем 5-мерный массив: test_arr_5[0][0][0][0][0] = "A"
+    eventPlayer.test_arr_5 = [[[[["A"]]]]]
+    wait()
+    logToInspector("TEST: Exp 0 (Init) - 5D val is {0}".format(eventPlayer.test_arr_5[0][0][0][0][0]))
+    
+    # --- ЭКСПЕРИМЕНТ 1: Добавление в корень ---
+    # Функция .append() в Overpy всегда работает только с корневым массивом.
+    # Посмотрим, не сломает ли это существующую вложенность.
+    eventPlayer.test_arr_5.append("B")
+    wait()
+    logToInspector("TEST: Exp 1 (Append to root) - arr5[1] is {0}, 5D val is still {1}".format(eventPlayer.test_arr_5[1], eventPlayer.test_arr_5[0][0][0][0][0]))
+    
+    # --- ЭКСПЕРИМЕНТ 2: Модификация внутреннего массива ---
+    # Прямая запись test_arr_5[0][0][0][0][0] = "C" не компилируется из-за лимитов Overpy.
+    # Но мы перезапишем кусок массива на уровне 3D, заменив "A" на "C" и добавив "D".
+    eventPlayer.test_arr_5[0][0][0] = [["C", "D"]]
+    wait()
+    logToInspector("TEST: Exp 2 (Modify inner via 3D) - [0] is {0}, [1] is {1}".format(eventPlayer.test_arr_5[0][0][0][0][0], eventPlayer.test_arr_5[0][0][0][0][1]))
+    
+    # --- ЭКСПЕРИМЕНТ 3: Чтение несуществующего индекса (Out of bounds) ---
+    # Проверим, крашится ли Workshop, если запросить 3-й элемент из 2-элементного массива на 5-й глубине.
+    logToInspector("TEST: Exp 3 (Out of bounds inner) - [2] is {0}".format(eventPlayer.test_arr_5[0][0][0][0][2]))
+    
+    # --- ЭКСПЕРИМЕНТ 4: Длина внутреннего массива ---
+    # Сможет ли Workshop корректно посчитать длину массива 4-го уровня? (ожидаем 2)
+    logToInspector("TEST: Exp 4 (Length of inner array) - len is {0}".format(len(eventPlayer.test_arr_5[0][0][0][0])))
+    
+    # --- ЭКСПЕРИМЕНТ 5: Фильтрация глубокого массива ---
+    # Попробуем применить lambda-функцию к внутреннему массиву.
+    eventPlayer.temp_array = eventPlayer.test_arr_5[0][0][0][0].filter(lambda x: x == "C")
+    wait()
+    logToInspector("TEST: Exp 5 (Filter inner array) - result is {0}".format(eventPlayer.temp_array[0]))
+
+    # --- ЭКСПЕРИМЕНТ 6: Смешанная вложенность ---
+    # Попробуем создать массив, где лежат элементы разной вложенности.
+    eventPlayer.test_arr_5 = [[[[["Deep"]]]], "Shallow", [["Medium"]]]
+    wait()
+    logToInspector("TEST: Exp 6 (Mixed depth) - 5D: {0}, 1D: {1}, 3D: {2}".format(eventPlayer.test_arr_5[0][0][0][0][0], eventPlayer.test_arr_5[1], eventPlayer.test_arr_5[2][0][0]))
+    
+    # --- ЭКСПЕРИМЕНТ 7: Удаление ---
+    # Workshop не умеет удалять элементы из внутренних массивов напрямую (нет такого action).
+    # Но мы можем удалить корневой элемент, где лежал 5D массив.
+    del eventPlayer.test_arr_5[0]
+    wait()
+    # Теперь на индексе 0 должен оказаться "Shallow".
+    logToInspector("TEST: Exp 7 (Delete root) - arr5[0] is {0}, len is {1}".format(eventPlayer.test_arr_5[0], len(eventPlayer.test_arr_5)))
+
+
