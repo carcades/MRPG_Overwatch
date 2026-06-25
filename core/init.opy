@@ -17,8 +17,7 @@ rule "Init":
     emerald_min_cost = start_emerald_cost
     start_emrld_mining_prgrss_delay = 0.016
     curr_emrld_mining_prgrss_delay = start_emrld_mining_prgrss_delay
-    #effects
-    effects_to_be_destroyed_array = []
+
 
 
 rule "Player Init":
@@ -57,6 +56,12 @@ rule "Player Init":
     eventPlayer.altar_left_2_ring = [rgb(0, 0, 0), false]
     #player init = true
     eventPlayer.current_zone = Zone.NONE
+    eventPlayer.active_buff_ids = []
+    eventPlayer.active_buff_targets = []
+    eventPlayer.active_buff_expire_times = []
+    eventPlayer.active_buff_types = []
+    eventPlayer.active_buff_actions = []
+    eventPlayer.active_buff_values = []
     eventPlayer.player_init = true
 
 

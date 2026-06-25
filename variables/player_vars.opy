@@ -64,3 +64,10 @@ playervar index_of_etbda_object 81
 playervar temp_var_0 82
 playervar temp_var_1 83
 playervar temp_var_2 84
+playervar active_buff_ids 85
+playervar active_buff_targets 87
+playervar active_buff_expire_times 88
+playervar active_buff_types 89
+playervar active_buff_actions 90
+playervar active_buff_values 91
+playervar buff_append_args 86

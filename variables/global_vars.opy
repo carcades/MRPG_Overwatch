@@ -63,8 +63,4 @@ globalvar curr_emrld_mining_prgrss_delay 57
 globalvar start_emrld_mining_prgrss_delay 58
 globalvar reader_holy_circle_iter_vectors 59
 globalvar reader_holy_circle_vectors 60
-globalvar effects_to_be_destroyed_array 61
-globalvar effects_array_index 62
-globalvar effects_array_append_args 63
-globalvar effects_to_be_destroyed_temp_arr 64
-globalvar eff_arr_current_deleted_element 65
+

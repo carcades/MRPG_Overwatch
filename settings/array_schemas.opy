@@ -87,7 +87,8 @@ macro Player.bleedingLevel = self.passives_data[PassivesData.BLEED_LEVEL]
 # ============================================================
 # effects_to_be_destroyed_array[i] — массив из 3-5 элементов
 enum EffectEntry:
-    TARGET = 0,
+    BUFF_ID = 0,
+    TARGET,
     EXPIRE_TIME,
     TYPE,
     ACTION,

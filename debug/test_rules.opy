@@ -70,7 +70,7 @@ rule "Правило 89":
 
 rule "Правило 93":
     @Disabled
-    hudHeader(getAllPlayers(), "{0}".format(len(effects_to_be_destroyed_array)), HudPosition.LEFT, 100, Color.WHITE, HudReeval.VISIBILITY_AND_STRING)
+    #hudHeader(getAllPlayers(), "{0}".format(len(effects_to_be_destroyed_array)), HudPosition.LEFT, 100, Color.WHITE, HudReeval.VISIBILITY_AND_STRING)
 
 
 rule "Правило 96":
@@ -97,7 +97,7 @@ rule "Правило 98":
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     
-    smallMessage(eventPlayer, "{0} {1}".format("index in etbda player[10][0] object", effects_to_be_destroyed_array.index(eventPlayer.prayerActiveEffects[0])))
+    #smallMessage(eventPlayer, "{0} {1}".format("index in etbda player[10][0] object", effects_to_be_destroyed_array.index(eventPlayer.prayerActiveEffects[0])))
 
 
 rule "Правило 99":
@@ -117,4 +117,4 @@ rule "Правило 100":
     @Event eachPlayer
     @Condition eventPlayer.isHoldingButton(Button.CROUCH) == true
     
-    hudHeader(getAllPlayers(), "{0} {1} {2} <0>".format(effects_to_be_destroyed_array[0][EffectEntry.TARGET], effects_to_be_destroyed_array[0][EffectEntry.EXPIRE_TIME], effects_to_be_destroyed_array[0][EffectEntry.TYPE]), HudPosition.LEFT, 0, Color.WHITE, HudReeval.VISIBILITY)
+    #hudHeader(getAllPlayers(), "{0} {1} {2} <0>".format(effects_to_be_destroyed_array[0][EffectEntry.TARGET], effects_to_be_destroyed_array[0][EffectEntry.EXPIRE_TIME], effects_to_be_destroyed_array[0][EffectEntry.TYPE]), HudPosition.LEFT, 0, Color.WHITE, HudReeval.VISIBILITY)

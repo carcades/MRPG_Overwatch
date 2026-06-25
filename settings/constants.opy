@@ -37,3 +37,10 @@ enum EffectType:
 enum EffectAction:
     SUBTRACT = 0,
     EXISTENCE_PRAYER_OF_SALVATION
+
+enum BuffId:
+    PRAYER_VISUAL = 0,
+    PRAYER_HEALTH_POOL,
+    PRAYER_HEAL_OVER_TIME,
+    PRAYER_SPEED,
+    PRAYER_ACTIVE_FLAG
