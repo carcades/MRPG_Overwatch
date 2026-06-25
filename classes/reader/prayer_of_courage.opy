@@ -54,66 +54,38 @@ rule "Reader Ability: prayer of courage":
         #if the reading of the prayer is successful
         if eventPlayer.courageProgress == eventPlayer.courageOriginalCastDur:
             eventPlayer.courageDuration = 20 + (5 * (eventPlayer.current_tier - 1))
-            #if player has no prayer effects (first cast)
-            if eventPlayer.courageIsActive != true:
-                smallMessage(eventPlayer, "courage prayer is not alr going")
-                #play one-shot visual/sound effects
-                playEffect(getAllPlayers(), DynamicEffect.BUFF_EXPLOSION_SOUND, Color.WHITE, eventPlayer, 200)
-                playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.YELLOW, eventPlayer, 8)
-                #create torbjorn overloading visual buff
-                createEffect(getAllPlayers(), Effect.TORBJORN_OVERLOADING, Color.ORANGE, eventPlayer, 200, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-                wait()
-                eventPlayer.buff_append_args = [BuffId.COURAGE_VISUAL, getLastCreatedEntity(), getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.ENTITY]
-                logToInspector("COURAGE: Adding visual buff. Args: {0}".format(eventPlayer.buff_append_args))
+            #play one-shot visual/sound effects
+            playEffect(getAllPlayers(), DynamicEffect.BUFF_EXPLOSION_SOUND, Color.WHITE, eventPlayer, 200)
+            playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.YELLOW, eventPlayer, 8)
+            
+            #extend all active Courage buffs unconditionally
+            eventPlayer.buff_append_args = [[BuffId.COURAGE_VISUAL, BuffId.COURAGE_DAMAGE, BuffId.COURAGE_ACTIVE_FLAG], getTotalTimeElapsed() + eventPlayer.courageDuration]
+            extend_buff()
+            
+            #create active flag if not exists
+            if eventPlayer.courageIsActive == false:
+                eventPlayer.buff_append_args = [BuffId.COURAGE_ACTIVE_FLAG, eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.PLAYER_VARIABLE, EffectAction.EXISTENCE_PRAYER_OF_COURAGE]
                 add_buff()
+
+            #if stacks not exceeded max (2 + tier)
+            if eventPlayer.courageStacks < (2 + eventPlayer.current_tier):
+                eventPlayer.courageStacks++
+                smallMessage(eventPlayer, "courage stack added: {0}".format(eventPlayer.courageStacks))
+                
                 #add damage
                 eventPlayer.courageDamageBonus = evalOnce(eventPlayer.stat_damage * 0.1)
                 eventPlayer.stat_damage += eventPlayer.courageDamageBonus
                 eventPlayer.setDamageDealt(eventPlayer.stat_damage)
                 eventPlayer.buff_append_args = [BuffId.COURAGE_DAMAGE, eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.DAMAGE, EffectAction.SUBTRACT, eventPlayer.courageDamageBonus]
-                smallMessage(eventPlayer, "courage duration: {0}".format(eventPlayer.courageDuration))
-                logToInspector("COURAGE: Adding damage buff. Args: {0}".format(eventPlayer.buff_append_args))
                 add_buff()
-                #player has prayer effects = True
-                eventPlayer.courageIsActive = true
-                eventPlayer.buff_append_args = [BuffId.COURAGE_ACTIVE_FLAG, eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.PLAYER_VARIABLE, EffectAction.EXISTENCE_PRAYER_OF_COURAGE]
-                logToInspector("COURAGE: Adding active flag. Args: {0}".format(eventPlayer.buff_append_args))
-                add_buff()
-                logToInspector("COURAGE: First cast complete. Active buffs count: {0}".format(len(eventPlayer.active_buff_ids)))
-            #if player already has prayer effects (re-cast)
             else:
-                smallMessage(eventPlayer, "courage prayer alr going")
-                #play one-shot visual/sound effects
-                playEffect(getAllPlayers(), DynamicEffect.BUFF_EXPLOSION_SOUND, Color.WHITE, eventPlayer, 200)
-                playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.YELLOW, eventPlayer, 8)
-                #extend or recreate visual buff
-                eventPlayer.buff_append_args = [BuffId.COURAGE_VISUAL, null, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.ENTITY]
-                logToInspector("COURAGE: Extending visual buff. Args: {0}".format(eventPlayer.buff_append_args))
-                extend_buff()
-                if eventPlayer.temp_var_1 == -1:
-                    logToInspector("COURAGE: Visual buff not found. Re-creating.")
-                    #visual buff already expired, recreate it
-                    createEffect(getAllPlayers(), Effect.TORBJORN_OVERLOADING, Color.ORANGE, eventPlayer, 200, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-                    wait()
-                    eventPlayer.buff_append_args = [BuffId.COURAGE_VISUAL, getLastCreatedEntity(), getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.ENTITY]
-                    logToInspector("COURAGE: Visual buff recreated args: {0}".format(eventPlayer.buff_append_args))
-                    add_buff()
-                #stack damage buff (always add new)
-                eventPlayer.courageDamageBonus = evalOnce(eventPlayer.stat_damage * 0.1)
-                eventPlayer.stat_damage += eventPlayer.courageDamageBonus
-                eventPlayer.setDamageDealt(eventPlayer.stat_damage)
-                eventPlayer.buff_append_args = [BuffId.COURAGE_DAMAGE, eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.DAMAGE, EffectAction.SUBTRACT, eventPlayer.courageDamageBonus]
-                logToInspector("COURAGE: Adding stack damage buff args: {0}".format(eventPlayer.buff_append_args))
+                smallMessage(eventPlayer, "max prayer stacks reached. duration extended.")
+                
+            #create visual buff if not exists (checked via active flag)
+            if eventPlayer.courageIsActive == false:
+                createEffect(getAllPlayers(), Effect.TORBJORN_OVERLOADING, Color.ORANGE, eventPlayer, 200, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+                wait()
+                eventPlayer.buff_append_args = [BuffId.COURAGE_VISUAL, getLastCreatedEntity(), getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.ENTITY]
                 add_buff()
-                #extend or recreate active flag
-                eventPlayer.buff_append_args = [BuffId.COURAGE_ACTIVE_FLAG, eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.PLAYER_VARIABLE, EffectAction.EXISTENCE_PRAYER_OF_COURAGE]
-                logToInspector("COURAGE: Extending active flag args: {0}".format(eventPlayer.buff_append_args))
-                extend_buff()
-                if eventPlayer.temp_var_1 == -1:
-                    logToInspector("COURAGE: Active flag not found. Re-creating.")
-                    #active flag expired, re-set it
-                    eventPlayer.courageIsActive = true
-                    logToInspector("COURAGE: Active flag recreated.")
-                    add_buff()
-                logToInspector("COURAGE: Re-cast complete. Active buffs count: {0}".format(len(eventPlayer.active_buff_ids)))
+                eventPlayer.courageIsActive = true
     eventPlayer.courageProgress = 0

@@ -13,21 +13,19 @@ def add_buff():
 
 
 def extend_buff():
-    @Name "Sub: Extend buff by BUFF_ID"
-    logToInspector("LIFECYCLE: extend_buff called for ID: {0}".format(eventPlayer.buff_append_args[EffectEntry.BUFF_ID]))
+    @Name "Sub: Extend buffs by array of IDs"
+    logToInspector("LIFECYCLE: extend_buff called for IDs: {0}".format(eventPlayer.buff_append_args[0]))
     eventPlayer.temp_var_1 = -1
     eventPlayer.temp_var_2 = 0
     while eventPlayer.temp_var_2 < len(eventPlayer.active_buff_ids):
-        if eventPlayer.active_buff_ids[eventPlayer.temp_var_2] == eventPlayer.buff_append_args[EffectEntry.BUFF_ID]:
+        if eventPlayer.active_buff_ids[eventPlayer.temp_var_2] in eventPlayer.buff_append_args[0]:
             eventPlayer.temp_var_1 = eventPlayer.temp_var_2
-            eventPlayer.active_buff_expire_times[eventPlayer.temp_var_1] = eventPlayer.buff_append_args[EffectEntry.EXPIRE_TIME]
-            logToInspector("LIFECYCLE: Buff ID {0} found at index {1}. New expiration: {2}".format(eventPlayer.buff_append_args[EffectEntry.BUFF_ID], eventPlayer.temp_var_1, eventPlayer.buff_append_args[EffectEntry.EXPIRE_TIME]))
-            #force loop exit without break (break may abort subroutine in Workshop)
-            eventPlayer.temp_var_2 = 1000
+            eventPlayer.active_buff_expire_times[eventPlayer.temp_var_1] = eventPlayer.buff_append_args[1]
+            logToInspector("LIFECYCLE: Extended buff ID {0} at index {1}. New exp: {2}".format(eventPlayer.active_buff_ids[eventPlayer.temp_var_1], eventPlayer.temp_var_1, eventPlayer.buff_append_args[1]))
         eventPlayer.temp_var_2++
         wait(0.016)
     if eventPlayer.temp_var_1 == -1:
-        logToInspector("LIFECYCLE: Buff ID {0} not found. Cannot extend.".format(eventPlayer.buff_append_args[EffectEntry.BUFF_ID]))
+        logToInspector("LIFECYCLE: No buffs found from requested IDs.")
 
 
 rule "Process player buffs":
@@ -54,9 +52,11 @@ rule "Process player buffs":
                 if eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.EXISTENCE_PRAYER_OF_SALVATION:
                     logToInspector("LIFECYCLE: Removing EXISTENCE_PRAYER_OF_SALVATION flag")
                     eventPlayer.prayerIsActive = false
+                    eventPlayer.salvationStacks = 0
                 elif eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.EXISTENCE_PRAYER_OF_COURAGE:
                     logToInspector("LIFECYCLE: Removing EXISTENCE_PRAYER_OF_COURAGE flag")
                     eventPlayer.courageIsActive = false
+                    eventPlayer.courageStacks = 0
             elif eventPlayer.active_buff_types[eventPlayer.index_of_etbda_object] == EffectType.SPEED:
                 if eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.SUBTRACT:
                     logToInspector("LIFECYCLE: Reverting SPEED change")

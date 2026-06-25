@@ -30,10 +30,14 @@ enum AngelicBranchData:
     COUR_ORIGINAL_CAST_DUR,
     COUR_SOUND_EFFECT_ID,
     COUR_IS_ACTIVE,
-    COUR_ITER
+    COUR_ITER,
+    SALV_STACKS,
+    COUR_STACKS
 
 # ----- Member-макросы для Angelic Branch Data -----
 macro Player.readerAbilities = self.branch_data[AngelicBranchData.ABILITIES_UNLOCKED]
+macro Player.salvationStacks = self.branch_data[AngelicBranchData.SALV_STACKS]
+macro Player.courageStacks = self.branch_data[AngelicBranchData.COUR_STACKS]
 macro Player.readerPrayerIter = self.branch_data[AngelicBranchData.PRAYER_ITER]
 macro Player.readerHolyCircleIter = self.branch_data[AngelicBranchData.HOLY_CIRCLE_ITER]
 macro Player.readerHolyCircleIterPlus = self.branch_data[AngelicBranchData.HOLY_CIRCLE_ITER_PLUS]
