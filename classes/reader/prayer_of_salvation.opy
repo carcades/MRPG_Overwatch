@@ -67,13 +67,13 @@ rule "Reader Ability: prayer for salvation":
                 logToInspector("PRAYER: Adding visual buff. Args: {0}".format(eventPlayer.buff_append_args))
                 add_buff()
                 #add health pool 
-                eventPlayer.addHealthPool(Health.SHIELDS, eventPlayer.getMaxHealth() / 3, true, false)
+                eventPlayer.addHealthPool(Health.SHIELDS, eventPlayer.stat_health / 3, true, false)
                 wait()
                 eventPlayer.buff_append_args = [BuffId.PRAYER_HEALTH_POOL, getLastCreatedHealthPool(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.HEALTH_BAR]
                 logToInspector("PRAYER: Adding health pool. Args: {0}".format(eventPlayer.buff_append_args))
                 add_buff()
                 #heal over time
-                eventPlayer.startHealingOverTime(eventPlayer, 100000000, eventPlayer.getMaxHealth() / 5 + ((eventPlayer.current_tier - 1) * 10))
+                eventPlayer.startHealingOverTime(eventPlayer, 100000000, eventPlayer.stat_health / 5 + ((eventPlayer.current_tier - 1) * 10))
                 wait()
                 eventPlayer.buff_append_args = [BuffId.PRAYER_HEAL_OVER_TIME, getLastHealingOverTimeId(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.HEAL_OVER_TIME]
                 logToInspector("PRAYER: Adding HOT. Args: {0}".format(eventPlayer.buff_append_args))
@@ -111,7 +111,7 @@ rule "Reader Ability: prayer for salvation":
                     logToInspector("PRAYER: Visual buff recreated args: {0}".format(eventPlayer.buff_append_args))
                     add_buff()
                 #stack health pool (always add new)
-                eventPlayer.addHealthPool(Health.SHIELDS, eventPlayer.getMaxHealth() / 3, true, false)
+                eventPlayer.addHealthPool(Health.SHIELDS, eventPlayer.stat_health / 3, true, false)
                 wait()
                 eventPlayer.buff_append_args = [BuffId.PRAYER_HEALTH_POOL, getLastCreatedHealthPool(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.HEALTH_BAR]
                 logToInspector("PRAYER: Adding stack health pool args: {0}".format(eventPlayer.buff_append_args))
@@ -123,7 +123,7 @@ rule "Reader Ability: prayer for salvation":
                 if eventPlayer.temp_var_1 == -1:
                     logToInspector("PRAYER: HOT not found. Re-creating.")
                     #heal over time already expired, recreate it
-                    eventPlayer.startHealingOverTime(eventPlayer, 100000000, eventPlayer.getMaxHealth() / 5 + ((eventPlayer.current_tier - 1) * 10))
+                    eventPlayer.startHealingOverTime(eventPlayer, 100000000, eventPlayer.stat_health / 5 + ((eventPlayer.current_tier - 1) * 10))
                     wait()
                     eventPlayer.buff_append_args = [BuffId.PRAYER_HEAL_OVER_TIME, getLastHealingOverTimeId(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.HEAL_OVER_TIME]
                     logToInspector("PRAYER: HOT recreated args: {0}".format(eventPlayer.buff_append_args))

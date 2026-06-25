@@ -66,7 +66,8 @@
 # --- Classes ---
 #!include "classes/reader/init.opy"
 #!include "classes/reader/holy_circle.opy"
-#!include "classes/reader/prayer.opy"
+#!include "classes/reader/prayer_of_salvation.opy"
+#!include "classes/reader/prayer_of_courage.opy"
 
 # --- Systems ---
 #!include "systems/effects_lifecycle.opy"

@@ -164,12 +164,25 @@ rule "Test 5D Array Mechanics":
     wait()
     logToInspector("TEST: Exp 6 (Mixed depth) - 5D: {0}, 1D: {1}, 3D: {2}".format(eventPlayer.test_arr_5[0][0][0][0][0], eventPlayer.test_arr_5[1], eventPlayer.test_arr_5[2][0][0]))
     
-    # --- ЭКСПЕРИМЕНТ 7: Удаление ---
-    # Workshop не умеет удалять элементы из внутренних массивов напрямую (нет такого action).
-    # Но мы можем удалить корневой элемент, где лежал 5D массив.
-    del eventPlayer.test_arr_5[0]
-    wait()
-    # Теперь на индексе 0 должен оказаться "Shallow".
-    logToInspector("TEST: Exp 7 (Delete root) - arr5[0] is {0}, len is {1}".format(eventPlayer.test_arr_5[0], len(eventPlayer.test_arr_5)))
 
 
+rule "Debug: Floating Damage Numbers":
+    @Event playerTookDamage
+    
+    # Create the text
+    createInWorldText(getAllPlayers(), round(eventDamage), eventPlayer.getEyePosition() + vect(random.uniform(-0.5, 0.5), random.uniform(0.5, 1), random.uniform(-0.5, 0.5)), 2, Clip.NONE, WorldTextReeval.NONE, Color.RED, SpecVisibility.DEFAULT)
+    # Queue for deletion
+    eventPlayer.test_arr_1.append(getLastCreatedText())
+    eventPlayer.test_arr_2.append(getTotalTimeElapsed() + 1.5)
+    
+rule "Debug: Destroy Floating Damage Numbers":
+    @Event eachPlayer
+    @Condition len(eventPlayer.test_arr_1) > 0
+    
+    if getTotalTimeElapsed() >= eventPlayer.test_arr_2[0]:
+        destroyInWorldText(eventPlayer.test_arr_1[0])
+        del eventPlayer.test_arr_1[0]
+        del eventPlayer.test_arr_2[0]
+    wait(0.1)
+    if len(eventPlayer.test_arr_1) > 0:
+        loop()

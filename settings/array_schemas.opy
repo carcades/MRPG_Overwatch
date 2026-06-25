@@ -28,7 +28,9 @@ enum AngelicBranchData:
     COUR_ADDED_DAMAGE,
     COUR_DURATION,
     COUR_ORIGINAL_CAST_DUR,
-    COUR_SOUND_EFFECT_ID
+    COUR_SOUND_EFFECT_ID,
+    COUR_IS_ACTIVE,
+    COUR_ITER
 
 # ----- Member-макросы для Angelic Branch Data -----
 macro Player.readerAbilities = self.branch_data[AngelicBranchData.ABILITIES_UNLOCKED]
@@ -52,9 +54,20 @@ macro Player.prayerHudBarId = self.branch_t1_hud_ids[0]
 macro Player.prayerWorldBarId = self.branch_t1_hud_ids[1]
 
 # Макросы для Courage (Tier 2)
+macro Player.readerCourageIter = self.branch_data[AngelicBranchData.COUR_ITER]
 macro Player.courageProgress = self.branch_data[AngelicBranchData.COUR_PROGRESS]
+macro Player.courageCastDuration = self.branch_data[AngelicBranchData.COUR_CAST_DURATION]
+macro Player.courageCanCastMoving = self.branch_data[AngelicBranchData.COUR_CAN_CAST_MOVING]
+macro Player.courageIsActive = self.branch_data[AngelicBranchData.COUR_IS_ACTIVE]
+macro Player.courageDuration = self.branch_data[AngelicBranchData.COUR_DURATION]
+macro Player.courageOriginalCastDur = self.branch_data[AngelicBranchData.COUR_ORIGINAL_CAST_DUR]
+macro Player.courageSoundEffectId = self.branch_data[AngelicBranchData.COUR_SOUND_EFFECT_ID]
+macro Player.courageDamageBonus = self.branch_data[AngelicBranchData.COUR_ADDED_DAMAGE]
+
 macro Player.courageHudIds = self.branch_t2_hud_ids
 macro Player.courageActiveEffects = self.branch_t2_active_effects
+macro Player.courageHudBarId = self.branch_t2_hud_ids[0]
+macro Player.courageWorldBarId = self.branch_t2_hud_ids[1]
 
 
 # ============================================================

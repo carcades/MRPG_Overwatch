@@ -54,6 +54,9 @@ rule "Process player buffs":
                 if eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.EXISTENCE_PRAYER_OF_SALVATION:
                     logToInspector("LIFECYCLE: Removing EXISTENCE_PRAYER_OF_SALVATION flag")
                     eventPlayer.prayerIsActive = false
+                elif eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.EXISTENCE_PRAYER_OF_COURAGE:
+                    logToInspector("LIFECYCLE: Removing EXISTENCE_PRAYER_OF_COURAGE flag")
+                    eventPlayer.courageIsActive = false
             elif eventPlayer.active_buff_types[eventPlayer.index_of_etbda_object] == EffectType.SPEED:
                 if eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.SUBTRACT:
                     logToInspector("LIFECYCLE: Reverting SPEED change")
