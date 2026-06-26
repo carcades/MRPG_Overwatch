@@ -87,7 +87,11 @@ enum PassivesData:
     BLEED_DURATION,
     BLEED_POWER,
     BLEED_CHANCE_PLAYER,
-    BLEED_LEVEL
+    BLEED_LEVEL,
+    CURSED_MARK_STACKS,
+    CURSED_MARK_EXPIRE,
+    CURSED_MARK_DAMAGE_POOL,
+    CURSED_MARK_EFFECT_ID
 
 macro Player.passiveVampire = self.passives_data[PassivesData.VAMP_PASSIVE]
 macro Player.vampireSize = self.passives_data[PassivesData.VAMP_SIZE]
@@ -125,4 +129,22 @@ enum StatLimit:
 macro Player.statLimitHealth = self.stats_limit[StatLimit.HEALTH]
 macro Player.statLimitDamage = self.stats_limit[StatLimit.DAMAGE]
 macro Player.statLimitSpeed = self.stats_limit[StatLimit.SPEED]
+
+# ============================================================
+# СХЕМЫ МАССИВОВ — DEMON WORSHIPER
+# ============================================================
+macro Player.cursedMarkStacks = self.passives_data[PassivesData.CURSED_MARK_STACKS]
+macro Player.cursedMarkExpire = self.passives_data[PassivesData.CURSED_MARK_EXPIRE]
+macro Player.cursedMarkDamagePool = self.passives_data[PassivesData.CURSED_MARK_DAMAGE_POOL]
+macro Player.cursedMarkEffectId = self.passives_data[PassivesData.CURSED_MARK_EFFECT_ID]
+
+enum DemonicBranchData:
+    IS_ANGELIC_FLAG = 0, # Must be false for Demons to prevent unlocking Reader abilities
+    CURSE_BASE_THRESHOLD,
+    CURSE_DURATION,
+    CURSE_DAMAGE_BONUS
+
+macro Player.dwCurseBaseThreshold = self.branch_data[DemonicBranchData.CURSE_BASE_THRESHOLD]
+macro Player.dwCurseDuration = self.branch_data[DemonicBranchData.CURSE_DURATION]
+macro Player.dwCurseDamageBonus = self.branch_data[DemonicBranchData.CURSE_DAMAGE_BONUS]
 

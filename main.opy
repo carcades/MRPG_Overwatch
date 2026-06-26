@@ -69,6 +69,8 @@
 #!include "classes/reader/prayer_of_salvation.opy"
 #!include "classes/reader/prayer_of_courage.opy"
 
+#!include "classes/demon_worshiper/cursed_mark.opy"
+
 # --- Systems ---
 #!include "systems/effects_lifecycle.opy"
 

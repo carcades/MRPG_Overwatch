@@ -39,7 +39,19 @@ rule ">>>>>> Selection Tier-2 Race <<<<<<":
         race_change_tp()
     #get demon worshiper race
     elif distance(vect(altar_right_1_point.x, altar_right_1_point.y - 1, altar_right_1_point.z), eventPlayer.getPosition()) <= 1:
-        smallMessage(eventPlayer, "2")
+        smallMessage(eventPlayer, "hold interact 5 sec to select this path")
+        wait(5, Wait.ABORT_WHEN_FALSE)
+        eventPlayer.altar_status = AltarStatus.DEMON_WORSHIPER
+        eventPlayer.current_race = ["Demon Worshiper", 2, rgb(204, 85, 0), eventPlayer]
+        # demonic branch data: [is_angelic, base_threshold, duration, damage_bonus]
+        eventPlayer.branch_data = [false, 150, 5, 10]
+        
+        # apply ash layer passive (20% dmg reduction)
+        eventPlayer.stat_damage_received = 80
+        eventPlayer.setDamageReceived(eventPlayer.stat_damage_received)
+        
+        disable_altar_effects()
+        race_change_tp()
 
 
 def enable_display_tier_2_effects():
