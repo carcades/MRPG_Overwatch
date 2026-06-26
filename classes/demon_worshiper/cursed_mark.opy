@@ -17,6 +17,11 @@ rule "Demon Worshiper: Apply Cursed Mark Stack":
         if victim.cursedMarkStacks == 0:
             createEffect(getAllPlayers(), Effect.SOMBRA_HACKED_LOOPING, Color.PURPLE, victim, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
             victim.cursedMarkEffectId = getLastCreatedEntity()
+            playEffect(getAllPlayers(), DynamicEffect.ANA_BIOTIC_GRENADE_EXPLOSION, Color.PURPLE, victim, 2)
+            
+            # Add to HUD
+            eventPlayer.buff_append_args = [victim, getTotalTimeElapsed() + eventPlayer.dwCurseDuration, "{0} Cursed Mark".format(iconString(Icon.SKULL)), Color.PURPLE, BuffId.CURSED_MARK]
+            add_hud_buff()
         
         # Add stack (max 3)
         if victim.cursedMarkStacks < 3:
@@ -27,9 +32,10 @@ rule "Demon Worshiper: Apply Cursed Mark Stack":
         
         # Set/refresh expiration timestamp
         victim.cursedMarkExpire = getTotalTimeElapsed() + eventPlayer.dwCurseDuration
+        if BuffId.CURSED_MARK in victim.hud_buff_ids:
+            victim.hud_buff_expires[victim.hud_buff_ids.index(BuffId.CURSED_MARK)] = victim.cursedMarkExpire
         
-        # Visual/Audio feedback
-        playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.PURPLE, victim, 2)
+        # Audio feedback for stack refresh
         playEffect(getAllPlayers(), DynamicEffect.DEBUFF_IMPACT_SOUND, Color.WHITE, victim, 100)
 
 rule "Demon Worshiper: Expire Cursed Mark":

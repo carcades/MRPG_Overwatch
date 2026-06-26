@@ -131,3 +131,13 @@ rule "Color: yellow-gold":
     color_yellow_gold = rgb(218, 165, 32)
     wait(0.1)
     loop()
+
+rule "Init Dummy Bot for Testing":
+    @Event eachPlayer
+    @Condition eventPlayer.isDummy() == true
+    @Condition eventPlayer.hasSpawned() == true
+    @Condition eventPlayer.player_init == false
+    
+    wait(1, Wait.IGNORE_CONDITION)
+    createInWorldText(getAllPlayers(), "Dummy{0}".format(" {0} x{1}".format(iconString(Icon.SKULL), eventPlayer.cursedMarkStacks) if eventPlayer.cursedMarkStacks > 0 else ""), eventPlayer, 2, Clip.SURFACES, WorldTextReeval.VISIBILITY_STRING_AND_COLOR, Color.WHITE)
+    eventPlayer.player_init = true

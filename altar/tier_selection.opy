@@ -24,7 +24,7 @@ rule ">>>>>> Selection Tier-2 Race <<<<<<":
         smallMessage(eventPlayer, "hold interact 5 sec to select this path")
         wait(5, Wait.ABORT_WHEN_FALSE)
         eventPlayer.altar_status = AltarStatus.READER
-        eventPlayer.current_race = ["Reader", 2, rgb(125, 155, 235), eventPlayer]
+        eventPlayer.current_race = ["Reader", 2, rgb(125, 155, 235), getAllPlayers()]
         # angelic branch data: [abilities, prayer_iter, holy_circle_iter, holy_circle_iter_plus, 
         #                       salv_progress, salv_cast_dur, salv_can_cast_moving, salv_is_active, salv_speed_bonus, salv_duration, salv_original_cast_dur, salv_sound,
         #                       cour_progress, cour_cast_dur, cour_can_cast_moving, cour_added_dmg_received, cour_added_damage, cour_duration, cour_original_cast_dur, cour_sound]
@@ -42,13 +42,17 @@ rule ">>>>>> Selection Tier-2 Race <<<<<<":
         smallMessage(eventPlayer, "hold interact 5 sec to select this path")
         wait(5, Wait.ABORT_WHEN_FALSE)
         eventPlayer.altar_status = AltarStatus.DEMON_WORSHIPER
-        eventPlayer.current_race = ["Demon Worshiper", 2, rgb(204, 85, 0), eventPlayer]
+        eventPlayer.current_race = ["Demon Worshiper", 2, rgb(204, 85, 0), getAllPlayers()]
         # demonic branch data: [is_angelic, base_threshold, duration, damage_bonus]
         eventPlayer.branch_data = [false, 150, 5, 10]
         
         # apply ash layer passive (20% dmg reduction)
         eventPlayer.stat_damage_received = 80
         eventPlayer.setDamageReceived(eventPlayer.stat_damage_received)
+        
+        # Add to HUD buff array
+        eventPlayer.buff_append_args = [eventPlayer, 9999999, "{0} Ash Layer".format(iconString(Icon.SKULL)), Color.GRAY, BuffId.DEMON_ASH_LAYER]
+        add_hud_buff()
         
         disable_altar_effects()
         race_change_tp()

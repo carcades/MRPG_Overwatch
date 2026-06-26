@@ -10,6 +10,7 @@ rule "Rt_enter":
     eventPlayer.setStatusEffect(null, Status.PHASED_OUT, 9999)
     eventPlayer.setStatusEffect(null, Status.HACKED, 9999)
     eventPlayer.teleport(vect(-93.307, 61.947, -160.003))
+    eventPlayer.current_zone = Zone.RELIC_TREASURY
 
 
 rule "Rt_exit":
@@ -21,3 +22,4 @@ rule "Rt_exit":
     wait(0.25)
     eventPlayer.clearStatusEffect(Status.HACKED)
     eventPlayer.clearStatusEffect(Status.PHASED_OUT)
+    eventPlayer.current_zone = Zone.BUBBLE
