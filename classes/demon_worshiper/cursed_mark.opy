@@ -19,6 +19,14 @@ rule "Demon Worshiper: Apply Cursed Mark Stack":
             victim.cursedMarkEffectId = getLastCreatedEntity()
             playEffect(getAllPlayers(), DynamicEffect.ANA_BIOTIC_GRENADE_EXPLOSION, Color.PURPLE, victim, 2)
             
+            # Register visual effect to global system on the victim
+            victim.active_buff_ids.append(BuffId.CURSED_MARK)
+            victim.active_buff_targets.append(victim.cursedMarkEffectId)
+            victim.active_buff_expire_times.append(getTotalTimeElapsed() + eventPlayer.dwCurseDuration)
+            victim.active_buff_types.append(EffectType.ENTITY)
+            victim.active_buff_actions.append(0)
+            victim.active_buff_values.append(0)
+            
             # Add to HUD
             eventPlayer.buff_append_args = [victim, getTotalTimeElapsed() + eventPlayer.dwCurseDuration, "{0} Cursed Mark".format(iconString(Icon.SKULL)), Color.PURPLE, BuffId.CURSED_MARK]
             add_hud_buff()
@@ -32,8 +40,14 @@ rule "Demon Worshiper: Apply Cursed Mark Stack":
         
         # Set/refresh expiration timestamp
         victim.cursedMarkExpire = getTotalTimeElapsed() + eventPlayer.dwCurseDuration
+        
+        # Extend HUD buff
         if BuffId.CURSED_MARK in victim.hud_buff_ids:
             victim.hud_buff_expires[victim.hud_buff_ids.index(BuffId.CURSED_MARK)] = victim.cursedMarkExpire
+            
+        # Extend global system entity buff
+        if BuffId.CURSED_MARK in victim.active_buff_ids:
+            victim.active_buff_expire_times[victim.active_buff_ids.index(BuffId.CURSED_MARK)] = victim.cursedMarkExpire
         
         # Audio feedback for stack refresh
         playEffect(getAllPlayers(), DynamicEffect.DEBUFF_IMPACT_SOUND, Color.WHITE, victim, 100)
@@ -49,6 +63,4 @@ rule "Demon Worshiper: Expire Cursed Mark":
     
     # Restore base damage received stat. Dummy bots have 0, so fallback to 100.
     eventPlayer.setDamageReceived(100 if eventPlayer.stat_damage_received == 0 else eventPlayer.stat_damage_received)
-    # Remove visual effect
-    destroyEffect(eventPlayer.cursedMarkEffectId)
     eventPlayer.cursedMarkEffectId = null

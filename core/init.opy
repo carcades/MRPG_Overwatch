@@ -8,7 +8,6 @@ rule "Init":
     disableGamemodeCompletion()
     setMatchTime(0)
     #general
-    xp_to_level_up = 100
     xp_per_mine = 10
     #emeralds
     start_emerald_cost = 150
@@ -66,42 +65,39 @@ rule "Player Init":
 
 
 rule "Init xp bar colors":
-    #colors of xp bar init: r, g, b; start, end
-    rgb_start_xp_bar = [0, 0, 0]
-    rgb_end_xp_bar = [238, 32, 77]
     #rgb: r, g, b; min, max
-    rgb_min_xp_bar = [min(rgb_start_xp_bar[0], rgb_end_xp_bar[0]), min(rgb_start_xp_bar[1], rgb_end_xp_bar[1]), min(rgb_start_xp_bar[2], rgb_end_xp_bar[2])]
-    rgb_max_xp_bar = [max(rgb_start_xp_bar[0], rgb_end_xp_bar[0]), max(rgb_start_xp_bar[1], rgb_end_xp_bar[1]), max(rgb_start_xp_bar[2], rgb_end_xp_bar[2])]
+    rgb_min_xp_bar = [min(RGB_START_XP_BAR[0], RGB_END_XP_BAR[0]), min(RGB_START_XP_BAR[1], RGB_END_XP_BAR[1]), min(RGB_START_XP_BAR[2], RGB_END_XP_BAR[2])]
+    rgb_max_xp_bar = [max(RGB_START_XP_BAR[0], RGB_END_XP_BAR[0]), max(RGB_START_XP_BAR[1], RGB_END_XP_BAR[1]), max(RGB_START_XP_BAR[2], RGB_END_XP_BAR[2])]
     #get vector R (rgb[0])
-    if rgb_min_xp_bar[0] != rgb_start_xp_bar[0]:
+    if rgb_min_xp_bar[0] != RGB_START_XP_BAR[0]:
         rgb_vector_xp_bar = [1]
     else:
         rgb_vector_xp_bar = [-1]
     #get vector G (rgb[1])
-    if rgb_min_xp_bar[1] != rgb_start_xp_bar[1]:
+    if rgb_min_xp_bar[1] != RGB_START_XP_BAR[1]:
         rgb_vector_xp_bar.append(1)
     else:
         rgb_vector_xp_bar.append(-1)
     #get vector B (rgb[2])
-    if rgb_min_xp_bar[2] != rgb_start_xp_bar[2]:
+    if rgb_min_xp_bar[2] != RGB_START_XP_BAR[2]:
         rgb_vector_xp_bar.append(1)
     else:
         rgb_vector_xp_bar.append(-1)
-    xp_bar_colors_length = xp_to_level_up + 900
+    xp_bar_colors_length = XP_TO_LEVEL_UP + 900
     #get xp_bar colors 0-100
     xp_bar_colors = [null]
-    for iterations in range(1, xp_to_level_up + 1):
-        xp_bar_colors.append(rgb(rgb_start_xp_bar[0] - (iterations * ((rgb_max_xp_bar[0] - rgb_min_xp_bar[0]) / xp_to_level_up)) if rgb_vector_xp_bar[0] == 1 else rgb_start_xp_bar[0] + (iterations * ((rgb_max_xp_bar[0] - rgb_min_xp_bar[0]) / xp_to_level_up)), rgb_start_xp_bar[1] - (iterations * ((rgb_max_xp_bar[1] - rgb_min_xp_bar[1]) / xp_to_level_up)) if rgb_vector_xp_bar[1] == 1 else rgb_start_xp_bar[1] + (iterations * ((rgb_max_xp_bar[1] - rgb_min_xp_bar[1]) / xp_to_level_up)), rgb_start_xp_bar[2] - (iterations * ((rgb_max_xp_bar[2] - rgb_min_xp_bar[2]) / xp_to_level_up)) if rgb_vector_xp_bar[2] == 1 else rgb_start_xp_bar[2] + (iterations * ((rgb_max_xp_bar[2] - rgb_min_xp_bar[2]) / xp_to_level_up))))
+    for iterations in range(1, XP_TO_LEVEL_UP + 1):
+        xp_bar_colors.append(rgb(RGB_START_XP_BAR[0] - (iterations * ((rgb_max_xp_bar[0] - rgb_min_xp_bar[0]) / XP_TO_LEVEL_UP)) if rgb_vector_xp_bar[0] == 1 else RGB_START_XP_BAR[0] + (iterations * ((rgb_max_xp_bar[0] - rgb_min_xp_bar[0]) / XP_TO_LEVEL_UP)), RGB_START_XP_BAR[1] - (iterations * ((rgb_max_xp_bar[1] - rgb_min_xp_bar[1]) / XP_TO_LEVEL_UP)) if rgb_vector_xp_bar[1] == 1 else RGB_START_XP_BAR[1] + (iterations * ((rgb_max_xp_bar[1] - rgb_min_xp_bar[1]) / XP_TO_LEVEL_UP)), RGB_START_XP_BAR[2] - (iterations * ((rgb_max_xp_bar[2] - rgb_min_xp_bar[2]) / XP_TO_LEVEL_UP)) if rgb_vector_xp_bar[2] == 1 else RGB_START_XP_BAR[2] + (iterations * ((rgb_max_xp_bar[2] - rgb_min_xp_bar[2]) / XP_TO_LEVEL_UP))))
         wait(0.05)
     #get high xp colors to dark
-    if rgb_start_xp_bar[0] + rgb_start_xp_bar[1] + rgb_start_xp_bar[2] >= rgb_end_xp_bar[0] + rgb_end_xp_bar[1] + rgb_end_xp_bar[2]:
-        for iterations in range(xp_to_level_up + 1, xp_to_level_up + 902):
-            xp_bar_colors.append(rgb(rgb_end_xp_bar[0] - iterations * (rgb_end_xp_bar[0] / 1000), rgb_end_xp_bar[1] - iterations * (rgb_end_xp_bar[1] / 1000), rgb_end_xp_bar[2] - iterations * (rgb_end_xp_bar[2] / 1000)))
+    if RGB_START_XP_BAR[0] + RGB_START_XP_BAR[1] + RGB_START_XP_BAR[2] >= RGB_END_XP_BAR[0] + RGB_END_XP_BAR[1] + RGB_END_XP_BAR[2]:
+        for iterations in range(XP_TO_LEVEL_UP + 1, XP_TO_LEVEL_UP + 902):
+            xp_bar_colors.append(rgb(RGB_END_XP_BAR[0] - iterations * (RGB_END_XP_BAR[0] / 1000), RGB_END_XP_BAR[1] - iterations * (RGB_END_XP_BAR[1] / 1000), RGB_END_XP_BAR[2] - iterations * (RGB_END_XP_BAR[2] / 1000)))
             wait(0.05)
     #get high xp colors to light
     else:
-        for iterations in range(xp_to_level_up + 1, xp_to_level_up + 902):
-            xp_bar_colors.append(rgb(rgb_end_xp_bar[0] + (iterations * ((255 - rgb_end_xp_bar[0]) / 1000)), rgb_end_xp_bar[1] + (iterations * ((255 - rgb_end_xp_bar[1]) / 1000)), rgb_end_xp_bar[2] + (iterations * ((255 - rgb_end_xp_bar[2]) / 1000))))
+        for iterations in range(XP_TO_LEVEL_UP + 1, XP_TO_LEVEL_UP + 902):
+            xp_bar_colors.append(rgb(RGB_END_XP_BAR[0] + (iterations * ((255 - RGB_END_XP_BAR[0]) / 1000)), RGB_END_XP_BAR[1] + (iterations * ((255 - RGB_END_XP_BAR[1]) / 1000)), RGB_END_XP_BAR[2] + (iterations * ((255 - RGB_END_XP_BAR[2]) / 1000))))
             wait(0.05)
 
 

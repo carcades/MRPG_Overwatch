@@ -11,11 +11,11 @@ def update_color_xp_bar():
 
 rule "Level Up":
     @Event eachPlayer
-    @Condition eventPlayer.xp >= xp_to_level_up
+    @Condition eventPlayer.xp >= XP_TO_LEVEL_UP
     @Condition eventPlayer.player_init == true
     
     eventPlayer.level++
-    eventPlayer.xp -= xp_to_level_up
+    eventPlayer.xp -= XP_TO_LEVEL_UP
     eventPlayer.level_up_points += random.randint(3, 5)
     eventPlayer.setScore(eventPlayer.level)
     update_color_xp_bar()

@@ -39,15 +39,11 @@ globalvar rt_left_2_pos 33
 globalvar rt_right_1_pos 34
 globalvar rt_right_2_pos 35
 globalvar color_yellow_gold 36
-globalvar cost_vial_exp 37
 globalvar rgb_min_xp_bar 38
 globalvar rgb_max_xp_bar 39
 globalvar rgb_vector_xp_bar 40
-globalvar xp_to_level_up 41
 globalvar xp_bar_colors 42
 globalvar iterations 43
-globalvar rgb_start_xp_bar 44
-globalvar rgb_end_xp_bar 45
 globalvar xp_bar_colors_length 46
 globalvar emerald_mine_cord 47
 globalvar emrld_mine_progress_bar_cord 48

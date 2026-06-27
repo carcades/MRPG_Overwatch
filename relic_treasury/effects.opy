@@ -18,4 +18,4 @@ rule "Rt text":
     #enter text
     createInWorldText(getAllPlayers(), "The Treasury Of Relics", vect(rt_enter_pos.x, 2 + rt_enter_pos.y, rt_enter_pos.z), 1.6, Clip.SURFACES, WorldTextReeval.COLOR, color_yellow_gold)
     #vial of expirence
-    createInWorldText(getAllPlayers(), "buy a vial of expirence\nfor {1} gold".format(null, cost_vial_exp), vect(rt_left_1_pos.x, rt_left_1_pos.y - 0, rt_left_1_pos.z), 1.3, Clip.SURFACES, WorldTextReeval.STRING)
+    createInWorldText(getAllPlayers(), "buy a vial of expirence\nfor {1} gold".format(null, COST_VIAL_EXP), vect(rt_left_1_pos.x, rt_left_1_pos.y - 0, rt_left_1_pos.z), 1.3, Clip.SURFACES, WorldTextReeval.STRING)

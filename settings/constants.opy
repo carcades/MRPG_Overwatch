@@ -3,6 +3,10 @@
 # ===== Compile-time Constants =====
 
 #!define SPAWN_BUBBLE_RADIUS 45.3
+#!define XP_TO_LEVEL_UP 100
+#!define COST_VIAL_EXP 10000
+#!define RGB_START_XP_BAR [0, 0, 0]
+#!define RGB_END_XP_BAR [238, 32, 77]
 
 
 # ===== Enumerations =====

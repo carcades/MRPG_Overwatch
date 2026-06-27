@@ -1,16 +1,19 @@
 #!mainFile "../main.opy"
 
-rule "Update description visibility status":
+rule "Show description":
     @Event eachPlayer
     @Condition eventPlayer.current_zone == Zone.ALTAR
+    @Condition eventPlayer.isHoldingButton(Button.CROUCH) == true
     
-    if eventPlayer.isHoldingButton(Button.CROUCH) == true:
-        eventPlayer.description_visibility_status = 1
-    else:
-        eventPlayer.description_visibility_status = 0
-    wait(0.05)
-    if ruleCondition:
-        loop()
+    eventPlayer.description_visibility_status = 1
+
+
+rule "Hide description":
+    @Event eachPlayer
+    @Condition eventPlayer.current_zone == Zone.ALTAR
+    @Condition eventPlayer.isHoldingButton(Button.CROUCH) == false
+    
+    eventPlayer.description_visibility_status = 0
 
 
 rule ">>>>>> Selection Tier-2 Race <<<<<<":
