@@ -80,3 +80,7 @@ playervar hud_buff_names 97
 playervar hud_buff_colors 98
 playervar hud_buff_expires 99
 playervar hud_buff_ids 100
+playervar bleed_expire_times 101
+playervar bleed_tick_damages 102
+playervar bleed_effect_ids 103
+playervar bleed_damage_pool_arr 104

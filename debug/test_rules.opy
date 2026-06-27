@@ -5,7 +5,16 @@ rule "bot":
     #getPlayersInSlot(2, Team.ALL).setDamageReceived(70)
 
 
+rule "bot initialization":
+    @Event eachPlayer
+    @Condition eventPlayer.isDummy() == true
+    @Condition eventPlayer.hasSpawned() == true
+    
+    eventPlayer.setMaxHealth(1000)
+
+
 rule "bot regen":
+    @Disabled
     @Event playerTookDamage
     @Condition eventPlayer.isDummy() == true
     

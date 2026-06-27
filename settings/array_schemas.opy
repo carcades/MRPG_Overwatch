@@ -91,7 +91,8 @@ enum PassivesData:
     CURSED_MARK_STACKS,
     CURSED_MARK_EXPIRE,
     CURSED_MARK_DAMAGE_POOL,
-    CURSED_MARK_EFFECT_ID
+    CURSED_MARK_EFFECT_ID,
+    IS_RECEIVING_BLEED_DAMAGE
 
 macro Player.passiveVampire = self.passives_data[PassivesData.VAMP_PASSIVE]
 macro Player.vampireSize = self.passives_data[PassivesData.VAMP_SIZE]
@@ -104,6 +105,8 @@ macro Player.bleedingDuration = self.passives_data[PassivesData.BLEED_DURATION]
 macro Player.bleedingPower = self.passives_data[PassivesData.BLEED_POWER]
 macro Player.bleedingChancePlayer = self.passives_data[PassivesData.BLEED_CHANCE_PLAYER]
 macro Player.bleedingLevel = self.passives_data[PassivesData.BLEED_LEVEL]
+macro Player.isReceivingBleedDamage = self.passives_data[PassivesData.IS_RECEIVING_BLEED_DAMAGE]
+
 # СХЕМЫ МАССИВОВ — EFFECTS TO BE DESTROYED
 # ============================================================
 # effects_to_be_destroyed_array[i] — массив из 3-5 элементов
