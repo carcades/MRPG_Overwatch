@@ -6,17 +6,17 @@ rule "Ug effects":
     createEffect(getAllPlayers(), Effect.RING, Color.BLUE, vect(underground_enter_pos.x, underground_enter_pos.y - 1.5, underground_enter_pos.z), 1, EffectReeval.NONE)
     createEffect(getAllPlayers(), Effect.RING, Color.BLUE, vect(underground_exit_pos.x, underground_exit_pos.y - 1.5, underground_exit_pos.z), 1, EffectReeval.NONE)
     #emeralds
-    createEffect(getAllPlayers(), Effect.RING, Color.GREEN, sell_emeralds_pos if localPlayer.current_zone == Zone.UNDERGROUND else vect(0, -999, 0), 1, EffectReeval.POSITION_AND_RADIUS)
-    createEffect(getAllPlayers(), Effect.RING, Color.GREEN, buy_emeralds_pos if localPlayer.current_zone == Zone.UNDERGROUND else vect(0, -999, 0), 1, EffectReeval.POSITION_AND_RADIUS)
+    createEffect(getAllPlayers().filter(lambda _: localPlayer.current_zone == Zone.UNDERGROUND), Effect.RING, Color.GREEN, sell_emeralds_pos, 1, EffectReeval.VISIBILITY)
+    createEffect(getAllPlayers().filter(lambda _: localPlayer.current_zone == Zone.UNDERGROUND), Effect.RING, Color.GREEN, buy_emeralds_pos, 1, EffectReeval.VISIBILITY)
     #wall
-    createEffect(getAllPlayers(), Effect.BAD_AURA, Color.GRAY, wall_underground_pos if localPlayer.current_zone == Zone.UNDERGROUND else vect(0, -999, 0), 4, EffectReeval.POSITION_AND_RADIUS)
+    createEffect(getAllPlayers().filter(lambda _: localPlayer.current_zone == Zone.UNDERGROUND), Effect.BAD_AURA, Color.GRAY, wall_underground_pos, 4, EffectReeval.VISIBILITY)
 
 
 rule "Ug text":
     wait(4)
     #Ug enter&exit
-    createInWorldText(getAllPlayers(), "Enter underground" if localPlayer.current_zone == Zone.BUBBLE else " ", vect(underground_enter_pos.x, underground_enter_pos.y + 0.3, underground_enter_pos.z), 1.3, Clip.SURFACES, WorldTextReeval.STRING, Color.BLUE)
-    createInWorldText(getAllPlayers(), "exit" if localPlayer.current_zone == Zone.UNDERGROUND else " ", underground_exit_pos, 1.7, Clip.SURFACES, WorldTextReeval.STRING, Color.BLUE)
+    createInWorldText(getAllPlayers().filter(lambda _: localPlayer.current_zone == Zone.BUBBLE), "Enter underground", vect(underground_enter_pos.x, underground_enter_pos.y + 0.3, underground_enter_pos.z), 1.3, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.BLUE)
+    createInWorldText(getAllPlayers().filter(lambda _: localPlayer.current_zone == Zone.UNDERGROUND), "exit", underground_exit_pos, 1.7, Clip.SURFACES, WorldTextReeval.VISIBILITY, Color.BLUE)
     #emeradls
-    createInWorldText(getAllPlayers(), "sell emeralds \r\nfor: {0}".format(current_emerald_cost) if localPlayer.current_zone == Zone.UNDERGROUND else " ", sell_emeralds_pos, 1.4, Clip.SURFACES, WorldTextReeval.STRING, rgb(60, 175, 90))
-    createInWorldText(getAllPlayers(), "buy emeralds\r\nfor: {0}".format(buy_emerald_cost) if localPlayer.current_zone == Zone.UNDERGROUND else " ", buy_emeralds_pos, 1.4, Clip.SURFACES, WorldTextReeval.STRING, rgb(60, 175, 90))
+    createInWorldText(getAllPlayers().filter(lambda _: localPlayer.current_zone == Zone.UNDERGROUND), "sell emeralds \r\nfor: {0}".format(current_emerald_cost), sell_emeralds_pos, 1.4, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, rgb(60, 175, 90))
+    createInWorldText(getAllPlayers().filter(lambda _: localPlayer.current_zone == Zone.UNDERGROUND), "buy emeralds\r\nfor: {0}".format(buy_emerald_cost), buy_emeralds_pos, 1.4, Clip.SURFACES, WorldTextReeval.VISIBILITY_AND_STRING, rgb(60, 175, 90))

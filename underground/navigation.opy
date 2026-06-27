@@ -30,6 +30,6 @@ rule "Underground wall":
     @Condition distance(eventPlayer.getPosition(), wall_underground_pos) <= 4
     
     eventPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), underground_exit_pos) + vect(0, 0.05, 0), 30, Relativity.TO_WORLD)
-    wait()
+    wait(0.25)
     if ruleCondition:
         loop()
