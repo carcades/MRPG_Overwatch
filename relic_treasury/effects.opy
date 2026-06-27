@@ -16,6 +16,6 @@ rule "Rt effects":
 rule "Rt text":
     wait(3)
     #enter text
-    createInWorldText(getAllPlayers(), "The Treasury Of Relics", vect(rt_enter_pos.x, 2 + rt_enter_pos.y, rt_enter_pos.z), 1.6, Clip.SURFACES, WorldTextReeval.COLOR, color_yellow_gold)
+    createInWorldText(getAllPlayers(), "The Treasury Of Relics", vect(rt_enter_pos.x, 2 + rt_enter_pos.y, rt_enter_pos.z), 1.6, Clip.SURFACES, WorldTextReeval.STRING_AND_COLOR, rgb(255, 200 + 55 * sinDeg(getTotalTimeElapsed() * 120), 100 + 100 * cosDeg(getTotalTimeElapsed() * 90)), SpecVisibility.DEFAULT)
     #vial of expirence
     createInWorldText(getAllPlayers(), "buy a vial of expirence\nfor {1} gold".format(null, COST_VIAL_EXP), vect(rt_left_1_pos.x, rt_left_1_pos.y - 0, rt_left_1_pos.z), 1.3, Clip.SURFACES, WorldTextReeval.STRING)

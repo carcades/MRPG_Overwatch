@@ -25,6 +25,7 @@ rule "Mining start":
 
 rule "Enter emerald mine area":
     @Event eachPlayer
+    @Condition eventPlayer.is_selection_hero == false
     @Condition distance(eventPlayer.getPosition(), emerald_mine_cord) <= 2
     
     eventPlayer.current_zone = Zone.EMERALD_MINE

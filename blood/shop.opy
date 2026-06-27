@@ -6,9 +6,10 @@ rule "Exit blood shop":
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     @Condition distance(eventPlayer.getPosition(), exit_blood_shop_pos) <= 1
     
-    eventPlayer.teleport(vect(136.405, 64.078, -167.114))
-    eventPlayer.setInvisibility(Invis.NONE)
-    eventPlayer.clearStatusEffect(Status.HACKED)
+    smallMessage(eventPlayer, "hold f 1 sec to exit")
+    wait(1, Wait.ABORT_WHEN_FALSE)
+    eventPlayer.teleport(enter_blood_shop_pos)
+    eventPlayer.setFacing(directionTowards(eventPlayer.getPosition(), vect(0, 0, 0)), Relativity.TO_WORLD)
     eventPlayer.current_zone = Zone.BUBBLE
 
 
@@ -17,6 +18,8 @@ rule "Enter blood shop":
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     @Condition distance(eventPlayer.getPosition(), enter_blood_shop_pos) <= 1
     
+    smallMessage(eventPlayer, "hold f 1 sec to enter")
+    wait(1, Wait.ABORT_WHEN_FALSE)
     eventPlayer.teleport(vect(136.175, 63.946, -175.165))
     eventPlayer.setInvisibility(Invis.ALL)
     playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION_SOUND, Color.RED, eventPlayer.getPosition(), 100)
@@ -28,9 +31,8 @@ rule "Blood shop wall":
     @Event eachPlayer
     @Condition eventPlayer.current_zone == Zone.BLOOD_SHOP
     @Condition distance(eventPlayer.getPosition(), wall_blood_shop_pos) <= 4
-    @Disabled
     
-    eventPlayer.applyImpulse(vect(0, 0.05, -1), 30, Relativity.TO_WORLD)
+    eventPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), exit_blood_shop_pos) + vect(0, 0.05, 0), 30, Relativity.TO_WORLD)
     wait()
     if ruleCondition:
         loop()
