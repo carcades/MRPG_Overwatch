@@ -1,16 +1,20 @@
 #!mainFile "../main.opy"
 
-rule "Respawn player":
-    @Event playerDied
+rule "Global Respawn & Teleport":
+    @Event eachPlayer
+    @Condition eventPlayer.isAlive() == true
+    @Condition eventPlayer.hasSpawned() == true
     @Condition eventPlayer.isDummy() == false
     @Condition eventPlayer.player_init == true
     
-    logToInspector("[RESPAWN] Player {0} died. Zone: {1}".format(eventPlayer, eventPlayer.current_zone))
-    waitUntil(eventPlayer.isAlive() == true, 99999)
-    logToInspector("[RESPAWN] Player {0} alive. Zone: {1}".format(eventPlayer, eventPlayer.current_zone))
     eventPlayer.teleport(respawn_point)
-    eventPlayer.current_zone = Zone.NONE
-    logToInspector("[RESPAWN] Player {0} current_zone = NONE".format(eventPlayer))
+    if eventPlayer.is_selection_hero == true:
+        eventPlayer.current_zone = Zone.UNDERGROUND
+        wait()
+        eventPlayer.current_zone = Zone.NONE
+        eventPlayer.is_selection_hero = false
+    else:
+        eventPlayer.current_zone = Zone.NONE
 
 
 rule "Remove negative effects after death":

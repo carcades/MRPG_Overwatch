@@ -29,7 +29,6 @@ rule "Underground wall":
     @Condition eventPlayer.current_zone == Zone.UNDERGROUND
     @Condition distance(eventPlayer.getPosition(), wall_underground_pos) <= 4
     
-    eventPlayer.applyImpulse(directionTowards(eventPlayer.getPosition(), underground_exit_pos) + vect(0, 0.05, 0), 30, Relativity.TO_WORLD)
-    wait(0.25)
-    if ruleCondition:
-        loop()
+    smallMessage(eventPlayer, "Access Denied")
+    playEffect(eventPlayer, DynamicEffect.BAD_EXPLOSION, Color.RED, eventPlayer.getPosition(), 1)
+    eventPlayer.teleport(underground_exit_pos)

@@ -24,6 +24,7 @@ rule "Walk out of spawn":
     @Event eachPlayer
     @Condition eventPlayer.current_zone != Zone.NONE
     @Condition distance(eventPlayer.getPosition(), vect(spawn_bubble_position.x, spawn_bubble_position.y - 1, spawn_bubble_position.z)) >= SPAWN_BUBBLE_RADIUS
+    @Condition eventPlayer.is_selection_hero == false
     
     logToInspector("[BUBBLE] Walk out of spawn triggered for {0}. Prev Zone: {1}, Dist: {2}".format(eventPlayer, eventPlayer.current_zone, distance(eventPlayer.getPosition(), spawn_bubble_position)))
     eventPlayer.current_zone = Zone.NONE
