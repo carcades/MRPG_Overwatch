@@ -14,12 +14,14 @@ rule "Enter altar":
             #wait(3, Wait.ABORT_WHEN_FALSE)
             eventPlayer.altar_status = AltarStatus.TIER_2_SELECTION
             enable_display_tier_2_effects()
+            eventPlayer.setInvisibility(Invis.ALL)
             eventPlayer.teleport(teleport_to_altar_point)
             eventPlayer.current_zone = Zone.ALTAR
     elif eventPlayer.altar_status == AltarStatus.TIER_2_SELECTION:
         smallMessage(eventPlayer, "hold f 1 sec to enter")
         wait(1, Wait.ABORT_WHEN_FALSE)
         enable_display_tier_2_effects()
+        eventPlayer.setInvisibility(Invis.ALL)
         eventPlayer.teleport(teleport_to_altar_point)
         eventPlayer.current_zone = Zone.ALTAR
 
@@ -31,5 +33,6 @@ rule "Exit altar":
     @Condition distance(eventPlayer.getPosition(), vect(exit_altar_point.x, exit_altar_point.y - 2, exit_altar_point.z)) <= 1.3
     
     eventPlayer.teleport(respawn_point)
+    eventPlayer.setInvisibility(Invis.NONE)
     eventPlayer.current_zone = Zone.BUBBLE
     disable_altar_effects()

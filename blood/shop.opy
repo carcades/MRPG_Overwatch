@@ -10,6 +10,7 @@ rule "Exit blood shop":
     wait(1, Wait.ABORT_WHEN_FALSE)
     eventPlayer.teleport(enter_blood_shop_pos)
     eventPlayer.setFacing(directionTowards(eventPlayer.getPosition(), vect(0, 0, 0)), Relativity.TO_WORLD)
+    eventPlayer.setInvisibility(Invis.NONE)
     eventPlayer.current_zone = Zone.BUBBLE
 
 

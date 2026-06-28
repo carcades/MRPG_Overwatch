@@ -134,6 +134,22 @@ rule "Init Dummy Bot for Testing":
     @Condition eventPlayer.hasSpawned() == true
     @Condition eventPlayer.player_init == false
     
+    # Stats init
+    eventPlayer.stat_healing_received = 100
+    eventPlayer.stat_damage = 100
+    eventPlayer.stat_health = 100
+    eventPlayer.stat_speed = 100
+    eventPlayer.stat_damage_received = 100
+    eventPlayer.stat_projectiles_speed = 100
+    
+    # Buff arrays init
+    eventPlayer.active_buff_ids = []
+    eventPlayer.active_buff_targets = []
+    eventPlayer.active_buff_expire_times = []
+    eventPlayer.active_buff_types = []
+    eventPlayer.active_buff_actions = []
+    eventPlayer.active_buff_values = []
+    
     wait(1, Wait.IGNORE_CONDITION)
     createInWorldText(getAllPlayers(), "Dummy{0}".format(" {0} x{1}".format(iconString(Icon.SKULL), eventPlayer.cursedMarkStacks) if eventPlayer.cursedMarkStacks > 0 else ""), eventPlayer, 2, Clip.SURFACES, WorldTextReeval.VISIBILITY_STRING_AND_COLOR, Color.WHITE)
     eventPlayer.player_init = true

@@ -80,6 +80,21 @@ rule "Process player buffs":
                     logToInspector("LIFECYCLE: Reverting HEALTH change")
                     eventPlayer.stat_health -= eventPlayer.active_buff_values[eventPlayer.index_of_etbda_object]
                     eventPlayer.setMaxHealth(eventPlayer.stat_health)
+            elif eventPlayer.active_buff_types[eventPlayer.index_of_etbda_object] == EffectType.DAMAGE_RECEIVED:
+                if eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.SUBTRACT:
+                    logToInspector("LIFECYCLE: Reverting DAMAGE_RECEIVED change")
+                    eventPlayer.stat_damage_received -= eventPlayer.active_buff_values[eventPlayer.index_of_etbda_object]
+                    eventPlayer.setDamageReceived(100 if eventPlayer.stat_damage_received == 0 else eventPlayer.stat_damage_received)
+            elif eventPlayer.active_buff_types[eventPlayer.index_of_etbda_object] == EffectType.HEALING_RECEIVED:
+                if eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.SUBTRACT:
+                    logToInspector("LIFECYCLE: Reverting HEALING_RECEIVED change")
+                    eventPlayer.stat_healing_received -= eventPlayer.active_buff_values[eventPlayer.index_of_etbda_object]
+                    eventPlayer.setHealingReceived(100 if eventPlayer.stat_healing_received == 0 else eventPlayer.stat_healing_received)
+            elif eventPlayer.active_buff_types[eventPlayer.index_of_etbda_object] == EffectType.PROJECTILE_SPEED:
+                if eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.SUBTRACT:
+                    logToInspector("LIFECYCLE: Reverting PROJECTILE_SPEED change")
+                    eventPlayer.stat_projectiles_speed -= eventPlayer.active_buff_values[eventPlayer.index_of_etbda_object]
+                    eventPlayer.setProjectileSpeed(100 if eventPlayer.stat_projectiles_speed == 0 else eventPlayer.stat_projectiles_speed)
             #delete expired buff from array
             logToInspector("LIFECYCLE: Deleting from active_buffs index {0}".format(eventPlayer.index_of_etbda_object))
             del eventPlayer.active_buff_ids[eventPlayer.index_of_etbda_object]

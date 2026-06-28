@@ -9,6 +9,7 @@ rule "Ug enter":
     wait(1, Wait.ABORT_WHEN_FALSE)
     eventPlayer.teleport(underground_exit_pos)
     eventPlayer.setFacing(directionTowards(eventPlayer.getPosition(), vect(0, 0, 0)), Relativity.TO_WORLD)
+    eventPlayer.setInvisibility(Invis.ALL)
     eventPlayer.current_zone = Zone.UNDERGROUND
 
 
@@ -21,6 +22,7 @@ rule "Ug exit":
     wait(1, Wait.ABORT_WHEN_FALSE)
     eventPlayer.teleport(underground_enter_pos)
     eventPlayer.setFacing(directionTowards(eventPlayer.getPosition(), vect(0, 0, 0)), Relativity.TO_WORLD)
+    eventPlayer.setInvisibility(Invis.NONE)
     eventPlayer.current_zone = Zone.BUBBLE
 
 
