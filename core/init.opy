@@ -128,6 +128,13 @@ rule "Color: yellow-gold":
     wait(0.1)
     loop()
 
+rule "Color: Dynamic Texts":
+    while true:
+        color_treasury_text = rgb(255, 200 + 55 * sinDeg(getTotalTimeElapsed() * 120), 100 + 100 * cosDeg(getTotalTimeElapsed() * 90))
+        # Сделали базу 180 и амплитуду 75 (минимум 105, максимум 255), чтобы не было темно-синего
+        color_altar_text = rgb(180 + 75 * sinDeg(getTotalTimeElapsed() * 100), 180 + 75 * cosDeg(getTotalTimeElapsed() * 130), 255)
+        wait(0.016)
+
 rule "Init Dummy Bot for Testing":
     @Event eachPlayer
     @Condition eventPlayer.isDummy() == true

@@ -60,4 +60,5 @@ globalvar start_emrld_mining_prgrss_delay 58
 globalvar reader_holy_circle_iter_vectors 59
 globalvar reader_holy_circle_vectors 60
 globalvar wall_underground_pos 61
-
+globalvar color_treasury_text 62
+globalvar color_altar_text 63

@@ -17,6 +17,8 @@ rule "Altar Of Rebirth effects":
 
 rule "Altar Of Rebirth text (eng)":
     wait(5)
+    #exit text
+    createInWorldText(getAllPlayers(), "exit", vect(exit_altar_point.x, exit_altar_point.y + 0.8, exit_altar_point.z), 1.6, Clip.SURFACES, WorldTextReeval.STRING_AND_COLOR, color_altar_text, SpecVisibility.DEFAULT)
     #description 
     createInWorldText(getAllPlayers(), localPlayer.altar_description_text[localPlayer.description_visibility_status], vect(altar_description_point.x, altar_description_point.y + 2, altar_description_point.z), 2, Clip.SURFACES, WorldTextReeval.STRING)
     #1-6 points text

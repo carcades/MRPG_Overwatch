@@ -24,4 +24,4 @@ rule "Spawn text":
     #select hero
     createInWorldText(getAllPlayers().filter(lambda _: localPlayer.current_zone == Zone.BUBBLE), "select a hero", vect(select_hero_point.x, select_hero_point.y + 0.45, select_hero_point.z), 1.2, Clip.SURFACES, WorldTextReeval.VISIBILITY)
     #ancient altar
-    createInWorldText(getAllPlayers().filter(lambda _: localPlayer.current_zone == Zone.BUBBLE), "Altar Of Rebirth", vect(enter_altar_pos.x, enter_altar_pos.y + 1.5, enter_altar_pos.z), 1.6, Clip.SURFACES, WorldTextReeval.VISIBILITY_STRING_AND_COLOR, rgb(120 + 80 * sinDeg(getTotalTimeElapsed() * 100), 120 + 80 * cosDeg(getTotalTimeElapsed() * 130), 255), SpecVisibility.DEFAULT)
+    createInWorldText(getAllPlayers().filter(lambda _: localPlayer.current_zone == Zone.BUBBLE), "Altar Of Rebirth", vect(enter_altar_pos.x, enter_altar_pos.y + 1.5, enter_altar_pos.z), 1.6, Clip.SURFACES, WorldTextReeval.VISIBILITY_STRING_AND_COLOR, color_altar_text, SpecVisibility.DEFAULT)
