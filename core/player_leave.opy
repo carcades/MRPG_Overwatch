@@ -16,14 +16,7 @@ rule "System: Garbage Collection on Player Leave":
         wait(0.016)
         
     # 2. Clean up HUD texts from effects_lifecycle
-    eventPlayer.temp_var_1 = 0
-    while eventPlayer.temp_var_1 < len(eventPlayer.hud_buff_ids):
-        # We don't actually have a destroyHudText for these because they are created globally and dynamically evaluate visibility.
-        # So we don't need to destroy the entities, just wait for variables to clear.
-        # But wait, wait! The HUD buff texts in core/hud.opy are GLOBAL! They are NOT created per-player.
-        # Thus, there are NO HUD texts to destroy here. They will just stop rendering for this player.
-        # So this step is actually empty.
-        break
+
         
     # 3. Clean up persistent entities from GC array
     eventPlayer.temp_var_1 = 0

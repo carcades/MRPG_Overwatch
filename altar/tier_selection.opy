@@ -55,8 +55,7 @@ rule ">>>>>> Selection Tier-2 Race <<<<<<":
         eventPlayer.apply_all_stats()
         
         # Add to HUD buff array
-        eventPlayer.buff_append_args = [eventPlayer, 9999999, "{0} Ash Layer".format(iconString(Icon.SKULL)), Color.GRAY, BuffId.DEMON_ASH_LAYER]
-        add_hud_buff()
+        eventPlayer.trackHud(BuffId.DEMON_ASH_LAYER, 9999999, "{0} Ash Layer".format(iconString(Icon.SKULL)), Color.GRAY)
         
         disable_altar_effects()
         race_change_tp()

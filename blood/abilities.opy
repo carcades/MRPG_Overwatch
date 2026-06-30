@@ -24,8 +24,9 @@ rule "Ability Bleeding":
             victim.bleed_effect_ids[eventPlayer.getSlot()] = getLastCreatedEntity()
             playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.RED, victim, 1)
             
-            eventPlayer.buff_append_args = [victim, getTotalTimeElapsed() + eventPlayer.bleedingDuration, "{0} Bleeding".format(iconString(Icon.HEART)), Color.RED, BuffId.BLEEDING]
-            add_hud_buff()
+            victim.trackHud(BuffId.BLEEDING, getTotalTimeElapsed() + eventPlayer.bleedingDuration, "{0} Bleeding".format(iconString(Icon.HEART)), Color.RED)
+        else:
+            victim.extendBuff(BuffId.BLEEDING, getTotalTimeElapsed() + eventPlayer.bleedingDuration)
 
 
 rule "Process Bleeding DoT":
@@ -70,6 +71,6 @@ rule "Clear Bleeding on Death or Spawn":
             destroyEffect(eventPlayer.bleed_effect_ids[eventPlayer.temp_var_2])
             eventPlayer.bleed_effect_ids[eventPlayer.temp_var_2] = null
             
-    while BuffId.BLEEDING in eventPlayer.hud_buff_ids:
-        eventPlayer.hud_buff_expires[eventPlayer.hud_buff_ids.index(BuffId.BLEEDING)] = 0
+    if BuffId.BLEEDING in eventPlayer.hud_buff_ids:
+        eventPlayer.extendBuff(BuffId.BLEEDING, 0)
 

@@ -59,15 +59,15 @@ rule "Reader Ability: prayer for salvation":
             playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.BLUE, eventPlayer, 8)
             
             #extend all active Salvation buffs unconditionally
-            eventPlayer.buff_append_args = [[BuffId.PRAYER_VISUAL, BuffId.PRAYER_HEALTH_POOL, BuffId.PRAYER_HEAL_OVER_TIME, BuffId.PRAYER_SPEED, BuffId.PRAYER_ACTIVE_FLAG], getTotalTimeElapsed() + eventPlayer.prayerDuration]
-            extend_buff()
+            eventPlayer.extendBuff(BuffId.PRAYER_VISUAL, getTotalTimeElapsed() + eventPlayer.prayerDuration)
+            eventPlayer.extendBuff(BuffId.PRAYER_HEALTH_POOL, getTotalTimeElapsed() + eventPlayer.prayerDuration)
+            eventPlayer.extendBuff(BuffId.PRAYER_HEAL_OVER_TIME, getTotalTimeElapsed() + eventPlayer.prayerDuration)
+            eventPlayer.extendBuff(BuffId.PRAYER_SPEED, getTotalTimeElapsed() + eventPlayer.prayerDuration)
+            eventPlayer.extendBuff(BuffId.PRAYER_ACTIVE_FLAG, getTotalTimeElapsed() + eventPlayer.prayerDuration)
             
             #create active flag if not exists
             if eventPlayer.prayerIsActive == false:
-                eventPlayer.buff_append_args = [BuffId.PRAYER_ACTIVE_FLAG, eventPlayer, getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.PLAYER_VARIABLE, EffectAction.EXISTENCE_PRAYER_OF_SALVATION]
-                add_buff()
-                eventPlayer.buff_append_args = [eventPlayer, getTotalTimeElapsed() + eventPlayer.prayerDuration, "{0} Prayer of Salvation".format(iconString(Icon.HALO)), Color.AQUA, BuffId.PRAYER_ACTIVE_FLAG]
-                add_hud_buff()
+                eventPlayer.applyVisibleDebuff(BuffId.PRAYER_ACTIVE_FLAG, eventPlayer, getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.PLAYER_VARIABLE, EffectAction.EXISTENCE_PRAYER_OF_SALVATION, 0, "{0} Prayer of Salvation".format(iconString(Icon.HALO)), Color.AQUA)
 
             #if stacks not exceeded max (2 + tier)
             if eventPlayer.salvationStacks < (2 + eventPlayer.current_tier):
@@ -77,19 +77,16 @@ rule "Reader Ability: prayer for salvation":
                 #add health pool 
                 eventPlayer.addHealthPool(Health.SHIELDS, (eventPlayer.base_stat_health + eventPlayer.mod_stat_health) / 3, true, false)
                 wait()
-                eventPlayer.buff_append_args = [BuffId.PRAYER_HEALTH_POOL, getLastCreatedHealthPool(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.HEALTH_BAR]
-                add_buff()
+                eventPlayer.trackBuff(BuffId.PRAYER_HEALTH_POOL, getLastCreatedHealthPool(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.HEALTH_BAR, 0, 0)
                 
                 #add heal over time
                 eventPlayer.startHealingOverTime(eventPlayer, 100000000, (eventPlayer.base_stat_health + eventPlayer.mod_stat_health) / 5 + ((eventPlayer.current_tier - 1) * 10))
                 wait()
-                eventPlayer.buff_append_args = [BuffId.PRAYER_HEAL_OVER_TIME, getLastHealingOverTimeId(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.HEAL_OVER_TIME]
-                add_buff()
+                eventPlayer.trackBuff(BuffId.PRAYER_HEAL_OVER_TIME, getLastHealingOverTimeId(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.HEAL_OVER_TIME, 0, 0)
                 
                 #add speed
                 eventPlayer.prayerSpeedBonus = evalOnce((eventPlayer.base_stat_speed + eventPlayer.mod_stat_speed) * (0.2 + ((eventPlayer.current_tier - 1) * 0.1)))
-                eventPlayer.buff_append_args = [BuffId.PRAYER_SPEED, eventPlayer, getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.SPEED, EffectAction.MODIFY_STAT, eventPlayer.prayerSpeedBonus]
-                add_buff()
+                eventPlayer.trackBuff(BuffId.PRAYER_SPEED, eventPlayer, getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.SPEED, EffectAction.MODIFY_STAT, eventPlayer.prayerSpeedBonus)
             else:
                 smallMessage(eventPlayer, "max prayer stacks reached. duration extended.")
                 
@@ -97,7 +94,6 @@ rule "Reader Ability: prayer for salvation":
             if eventPlayer.prayerIsActive == false:
                 createEffect(getAllPlayers(), Effect.ANA_NANO_BOOSTED, Color.TEAM_2, eventPlayer, 200, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
                 wait()
-                eventPlayer.buff_append_args = [BuffId.PRAYER_VISUAL, getLastCreatedEntity(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.ENTITY]
-                add_buff()
+                eventPlayer.trackBuff(BuffId.PRAYER_VISUAL, getLastCreatedEntity(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.ENTITY, 0, 0)
                 eventPlayer.prayerIsActive = true
     eventPlayer.prayerProgress = 0

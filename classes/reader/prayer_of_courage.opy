@@ -59,15 +59,13 @@ rule "Reader Ability: prayer of courage":
             playEffect(getAllPlayers(), DynamicEffect.RING_EXPLOSION, Color.YELLOW, eventPlayer, 8)
             
             #extend all active Courage buffs unconditionally
-            eventPlayer.buff_append_args = [[BuffId.COURAGE_VISUAL, BuffId.COURAGE_DAMAGE, BuffId.COURAGE_ACTIVE_FLAG], getTotalTimeElapsed() + eventPlayer.courageDuration]
-            extend_buff()
+            eventPlayer.extendBuff(BuffId.COURAGE_VISUAL, getTotalTimeElapsed() + eventPlayer.courageDuration)
+            eventPlayer.extendBuff(BuffId.COURAGE_DAMAGE, getTotalTimeElapsed() + eventPlayer.courageDuration)
+            eventPlayer.extendBuff(BuffId.COURAGE_ACTIVE_FLAG, getTotalTimeElapsed() + eventPlayer.courageDuration)
             
             #create active flag if not exists
             if eventPlayer.courageIsActive == false:
-                eventPlayer.buff_append_args = [BuffId.COURAGE_ACTIVE_FLAG, eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.PLAYER_VARIABLE, EffectAction.EXISTENCE_PRAYER_OF_COURAGE]
-                add_buff()
-                eventPlayer.buff_append_args = [eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, "{0} Prayer of Courage".format(iconString(Icon.FIRE)), Color.YELLOW, BuffId.COURAGE_ACTIVE_FLAG]
-                add_hud_buff()
+                eventPlayer.applyVisibleDebuff(BuffId.COURAGE_ACTIVE_FLAG, eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.PLAYER_VARIABLE, EffectAction.EXISTENCE_PRAYER_OF_COURAGE, 0, "{0} Prayer of Courage".format(iconString(Icon.FIRE)), Color.YELLOW)
 
             #if stacks not exceeded max (2 + tier)
             if eventPlayer.courageStacks < (2 + eventPlayer.current_tier):
@@ -76,8 +74,7 @@ rule "Reader Ability: prayer of courage":
                 
                 #add damage
                 eventPlayer.courageDamageBonus = evalOnce((eventPlayer.base_stat_damage + eventPlayer.mod_stat_damage) * 0.1)
-                eventPlayer.buff_append_args = [BuffId.COURAGE_DAMAGE, eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.DAMAGE, EffectAction.MODIFY_STAT, eventPlayer.courageDamageBonus]
-                add_buff()
+                eventPlayer.trackBuff(BuffId.COURAGE_DAMAGE, eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.DAMAGE, EffectAction.MODIFY_STAT, eventPlayer.courageDamageBonus)
             else:
                 smallMessage(eventPlayer, "max prayer stacks reached. duration extended.")
                 
@@ -85,7 +82,6 @@ rule "Reader Ability: prayer of courage":
             if eventPlayer.courageIsActive == false:
                 createEffect(getAllPlayers(), Effect.TORBJORN_OVERLOADING, Color.ORANGE, eventPlayer, 200, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
                 wait()
-                eventPlayer.buff_append_args = [BuffId.COURAGE_VISUAL, getLastCreatedEntity(), getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.ENTITY]
-                add_buff()
+                eventPlayer.trackBuff(BuffId.COURAGE_VISUAL, getLastCreatedEntity(), getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.ENTITY, 0, 0)
                 eventPlayer.courageIsActive = true
     eventPlayer.courageProgress = 0

@@ -180,7 +180,7 @@ LITERAL_MEMBER_RE = re.compile(r"([A-Za-z_]\w*)\.([a-z_]\w*)\s*=\s*\[")
 LITERAL_BARE_RE = re.compile(r"(?<![A-Za-z0-9_\.])([a-z_]\w*)\s*=\s*\[")
 # ручная мутация active_buff_* или hud_buff_*:  <obj>.active_buff_ids.append( или <obj>.active_buff_expire_times[i] =
 MANUAL_MUTATION_RE = re.compile(
-    r"\b(active_buff_|hud_buff_)[a-z_]+\s*(?:\.\s*append\s*\(|\[[^\]]+\]\s*=)"
+    r"\b(active_buff_|hud_buff_)[a-z_]+\s*(?:\.\s*append\s*\(|\[[^\]]+\]\s*=(?!=))"
 )
 BUFF_APPEND_ASSIGN_RE = re.compile(r"\.buff_append_args\s*=\s*\[")
 BUFF_CALL_RE = re.compile(r"(?<![A-Za-z0-9_\.])(add_buff|add_hud_buff|extend_buff)\s*\(")
@@ -901,6 +901,70 @@ def check_legacy_stat_vars(idx: Index) -> list:
     return findings
 
 
+def check_legacy_api(idx: Index) -> list:
+    """I. Запрет на старый API эффектов (add_buff и др.)."""
+    findings = []
+    for bc in idx.buff_calls:
+        if bc.rel_path in BUFF_API_FILES:
+            continue
+        abs_path = os.path.join(PROJECT_ROOT, bc.rel_path)
+        if not os.path.isfile(abs_path):
+            continue
+        with open(abs_path, "r", encoding="utf-8") as f:
+            lines = norm_line_endings(f.read()).split("\n")
+        line = _line_of_offset(lines, bc.line)
+        findings.append(Finding("ERROR", bc.rel_path, line,
+            f"Вызов устаревшей подпрограммы {bc.name}(). Используйте макросы trackBuff, applyVisibleDebuff или extendBuff."))
+            
+    for ba in idx.buff_appends:
+        if ba.rel_path in BUFF_API_FILES:
+            continue
+        findings.append(Finding("ERROR", ba.rel_path, ba.line,
+            f"Ручное присвоение buff_append_args запрещено вне API макросов."))
+            
+    return findings
+
+
+def check_loop_safety(idx: Index) -> list:
+    """J. Защита от зависаний (while без wait)."""
+    findings = []
+    WHILE_RE = re.compile(r"^(\s*)while\b")
+    WAIT_RE = re.compile(r"^\s*wait\s*\(")
+    
+    rel_paths = discover_files()
+    files = load_files(rel_paths)
+    for sf in files:
+        lines = sf.lines
+        i = 0
+        n = len(lines)
+        while i < n:
+            code = strip_inline_comment(lines[i])
+            m = WHILE_RE.match(code)
+            if m:
+                indent = m.group(1)
+                has_wait = False
+                j = i + 1
+                while j < n:
+                    if lines[j].strip() == "" or lines[j].strip().startswith("#"):
+                        j += 1
+                        continue
+                    # если строка не начинается с бОльшего отступа, значит блок while закончился
+                    if not lines[j].startswith(indent + " ") and not lines[j].startswith(indent + "\t"):
+                        break
+                    
+                    code_j = strip_inline_comment(lines[j])
+                    if WAIT_RE.match(code_j):
+                        has_wait = True
+                    j += 1
+                
+                if not has_wait:
+                    findings.append(Finding("ERROR", sf.rel_path, i + 1,
+                        "Цикл while не содержит вызова wait(), что может привести к падению сервера (Server load too high)."))
+                i = j
+            else:
+                i += 1
+    return findings
+
 # --- Реестр и раннер ---------------------------------------------------------
 
 CHECKS = [
@@ -913,6 +977,8 @@ CHECKS = [
     ("F. HUD-связность", check_hud_linkage),
     ("G. Утечки памяти (GC)", check_entity_leaks),
     ("H. Устаревшие статы", check_legacy_stat_vars),
+    ("I. Устаревший API", check_legacy_api),
+    ("J. Безопасность циклов", check_loop_safety),
 ]
 
 
