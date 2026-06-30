@@ -19,17 +19,8 @@ rule "Demon Worshiper: Apply Cursed Mark Stack":
             victim.cursedMarkEffectId = getLastCreatedEntity()
             playEffect(getAllPlayers(), DynamicEffect.ANA_BIOTIC_GRENADE_EXPLOSION, Color.PURPLE, victim, 2)
             
-            # Register visual effect to global system on the victim
-            victim.active_buff_ids.append(BuffId.CURSED_MARK_VISUAL)
-            victim.active_buff_targets.append(victim.cursedMarkEffectId)
-            victim.active_buff_expire_times.append(getTotalTimeElapsed() + eventPlayer.dwCurseDuration)
-            victim.active_buff_types.append(EffectType.ENTITY)
-            victim.active_buff_actions.append(0)
-            victim.active_buff_values.append(0)
-            
-            # Add to HUD
-            eventPlayer.buff_append_args = [victim, getTotalTimeElapsed() + eventPlayer.dwCurseDuration, "{0} Cursed Mark".format(iconString(Icon.SKULL)), Color.PURPLE, BuffId.CURSED_MARK_VISUAL]
-            add_hud_buff()
+            # Register visual effect to global system on the victim and HUD
+            victim.applyVisibleDebuff(BuffId.CURSED_MARK_VISUAL, victim.cursedMarkEffectId, getTotalTimeElapsed() + eventPlayer.dwCurseDuration, EffectType.ENTITY, 0, 0, "{0} Cursed Mark".format(iconString(Icon.SKULL)), Color.PURPLE)
         
         # Add stack (max 3)
         if victim.cursedMarkStacks < 3:
@@ -41,12 +32,7 @@ rule "Demon Worshiper: Apply Cursed Mark Stack":
             
             if victim.cursedMarkStacks == 1:
                 # Register new stat buff
-                victim.active_buff_ids.append(BuffId.CURSED_MARK_STAT)
-                victim.active_buff_targets.append(victim)
-                victim.active_buff_expire_times.append(getTotalTimeElapsed() + eventPlayer.dwCurseDuration)
-                victim.active_buff_types.append(EffectType.DAMAGE_RECEIVED)
-                victim.active_buff_actions.append(EffectAction.SUBTRACT)
-                victim.active_buff_values.append(eventPlayer.dwCurseDamageBonus)
+                victim.trackBuff(BuffId.CURSED_MARK_STAT, victim, getTotalTimeElapsed() + eventPlayer.dwCurseDuration, EffectType.DAMAGE_RECEIVED, EffectAction.SUBTRACT, eventPlayer.dwCurseDamageBonus)
             else:
                 # Update existing stat buff value
                 victim.active_buff_values[victim.active_buff_ids.index(BuffId.CURSED_MARK_STAT)] += eventPlayer.dwCurseDamageBonus
