@@ -21,6 +21,7 @@
 #!include "core/init.opy"
 #!include "core/leveling.opy"
 #!include "core/respawn.opy"
+#!include "core/player_leave.opy"
 #!include "core/hud.opy"
 
 # --- Spawn Area ---

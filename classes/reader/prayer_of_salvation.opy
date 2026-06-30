@@ -75,21 +75,19 @@ rule "Reader Ability: prayer for salvation":
                 smallMessage(eventPlayer, "salvation stack added: {0}".format(eventPlayer.salvationStacks))
                 
                 #add health pool 
-                eventPlayer.addHealthPool(Health.SHIELDS, eventPlayer.stat_health / 3, true, false)
+                eventPlayer.addHealthPool(Health.SHIELDS, (eventPlayer.base_stat_health + eventPlayer.mod_stat_health) / 3, true, false)
                 wait()
                 eventPlayer.buff_append_args = [BuffId.PRAYER_HEALTH_POOL, getLastCreatedHealthPool(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.HEALTH_BAR]
                 add_buff()
                 
                 #add heal over time
-                eventPlayer.startHealingOverTime(eventPlayer, 100000000, eventPlayer.stat_health / 5 + ((eventPlayer.current_tier - 1) * 10))
+                eventPlayer.startHealingOverTime(eventPlayer, 100000000, (eventPlayer.base_stat_health + eventPlayer.mod_stat_health) / 5 + ((eventPlayer.current_tier - 1) * 10))
                 wait()
                 eventPlayer.buff_append_args = [BuffId.PRAYER_HEAL_OVER_TIME, getLastHealingOverTimeId(), getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.HEAL_OVER_TIME]
                 add_buff()
                 
                 #add speed
-                eventPlayer.prayerSpeedBonus = evalOnce(eventPlayer.stat_speed * (0.2 + ((eventPlayer.current_tier - 1) * 0.1)))
-                eventPlayer.stat_speed += eventPlayer.prayerSpeedBonus
-                eventPlayer.setMoveSpeed(eventPlayer.stat_speed)
+                eventPlayer.prayerSpeedBonus = evalOnce((eventPlayer.base_stat_speed + eventPlayer.mod_stat_speed) * (0.2 + ((eventPlayer.current_tier - 1) * 0.1)))
                 eventPlayer.buff_append_args = [BuffId.PRAYER_SPEED, eventPlayer, getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.SPEED, EffectAction.SUBTRACT, eventPlayer.prayerSpeedBonus]
                 add_buff()
             else:

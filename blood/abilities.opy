@@ -15,9 +15,9 @@ rule "Ability Bleeding":
     @Condition victim.isReceivingBleedDamage == false
     @Condition eventPlayer != victim
     
-    if random.uniform(0, 100) <= (eventPlayer.bleedingChancePlayer * 10 * (eventDamage / max(1, eventPlayer.stat_damage))):
+    if random.uniform(0, 100) <= (eventPlayer.bleedingChancePlayer * 10 * (eventDamage / max(1, (eventPlayer.base_stat_damage + eventPlayer.mod_stat_damage)))):
         victim.bleed_expire_times[eventPlayer.getSlot()] = getTotalTimeElapsed() + eventPlayer.bleedingDuration
-        victim.bleed_tick_damages[eventPlayer.getSlot()] = eventPlayer.stat_damage / 3 * eventPlayer.bleedingPower
+        victim.bleed_tick_damages[eventPlayer.getSlot()] = (eventPlayer.base_stat_damage + eventPlayer.mod_stat_damage) / 3 * eventPlayer.bleedingPower
         
         if victim.bleed_effect_ids[eventPlayer.getSlot()] == 0 or victim.bleed_effect_ids[eventPlayer.getSlot()] == null:
             createEffect(getAllPlayers(), Effect.SIGMA_GRAVITIC_FLUX_TARGET, Color.RED, victim, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)

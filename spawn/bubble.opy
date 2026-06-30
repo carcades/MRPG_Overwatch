@@ -14,7 +14,7 @@ rule "Enter spawn":
     if distance(eventPlayer.getPosition(), vect(spawn_bubble_position.x, spawn_bubble_position.y - 1, spawn_bubble_position.z)) < SPAWN_BUBBLE_RADIUS:
         logToInspector("[BUBBLE] Enter spawn success for {0}".format(eventPlayer))
         eventPlayer.setStatusEffect(null, Status.PHASED_OUT, 99999)
-        eventPlayer.startHealingOverTime(eventPlayer, 99999, eventPlayer.stat_health / 4)
+        eventPlayer.startHealingOverTime(eventPlayer, 99999, (eventPlayer.base_stat_health + eventPlayer.mod_stat_health) / 4)
         eventPlayer.heal_bubble = getLastHealingOverTimeId()
         eventPlayer.current_zone = Zone.BUBBLE
         smallMessage(eventPlayer, "enter")

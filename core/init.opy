@@ -29,12 +29,8 @@ rule "Player Init":
     #STATS limit: health, damage, speed
     eventPlayer.stats_limit = [500, 500, 125]
     #stats init
-    eventPlayer.stat_healing_received = 100
-    eventPlayer.stat_damage = 100
-    eventPlayer.stat_health = 100
-    eventPlayer.stat_speed = 100
-    eventPlayer.stat_damage_received = 100
-    eventPlayer.stat_projectiles_speed = 100
+    eventPlayer.base_stats = [0, 0, 0, 0, 100, 100, 100, 100, 100, 100]
+    eventPlayer.mod_stats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     #passives init: [VAMP_PASSIVE, VAMP_SIZE, VAMP_LEVEL, BLEED_PASSIVE, BLEED_CHANCE, BLEED_CD, BLEED_DURATION, BLEED_POWER, BLEED_CHANCE_PLAYER, BLEED_LEVEL, CURSED_MARK_STACKS, CURSED_MARK_EXPIRE, CURSED_MARK_DAMAGE_POOL, CURSED_MARK_EFFECT_ID, IS_RECEIVING_BLEED_DAMAGE]
     eventPlayer.passives_data = [false, 0, 0, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false]
     #currency
@@ -63,6 +59,8 @@ rule "Player Init":
     eventPlayer.active_buff_types = []
     eventPlayer.active_buff_actions = []
     eventPlayer.active_buff_values = []
+    eventPlayer.gc_ids = []
+    eventPlayer.gc_types = []
     eventPlayer.player_init = true
 
 
@@ -144,15 +142,36 @@ rule "Init Dummy Bot for Testing":
     @Condition eventPlayer.player_init == false
     
     # Stats init
-    eventPlayer.stat_healing_received = 100
-    eventPlayer.stat_damage = 100
-    eventPlayer.stat_health = 100
-    eventPlayer.stat_speed = 100
-    eventPlayer.stat_damage_received = 100
-    eventPlayer.stat_projectiles_speed = 100
+    eventPlayer.stats_limit = [500, 500, 125]
+    eventPlayer.base_stats = [0, 0, 0, 0, 100, 100, 100, 100, 100, 100]
+    eventPlayer.mod_stats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     # Passives init (нужно до чтения cursedMarkStacks ниже): см. enum PassivesData
     eventPlayer.passives_data = [false, 0, 0, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false]
+    
+    # Currency and leveling
+    eventPlayer.level_up_points = 100
+    eventPlayer.xp_multi = 1
+    eventPlayer.current_tier = 1
+    
+    # Race init [race_name, race_text_size, race_text_color]
+    eventPlayer.current_race = ["Human", 2, rgb(180, 190, 185), getAllPlayers()]
+    
+    # Seppuku init
+    eventPlayer.seppuku_level = 3
+    eventPlayer.level_to_seppuku = 40
+    
+    # Blood upgrades cost
+    eventPlayer.blood_xp_cost = 5
+    eventPlayer.bleeding_cost = 10
+    eventPlayer.vampire_cost = 10
+    
+    # Altar rings initiate
+    eventPlayer.altar_left_1_ring = [rgb(0, 0, 0), false]
+    eventPlayer.altar_left_2_ring = [rgb(0, 0, 0), false]
+    
+    # Zone
+    eventPlayer.current_zone = Zone.NONE
 
     # Buff arrays init
     eventPlayer.active_buff_ids = []
@@ -161,7 +180,10 @@ rule "Init Dummy Bot for Testing":
     eventPlayer.active_buff_types = []
     eventPlayer.active_buff_actions = []
     eventPlayer.active_buff_values = []
+    eventPlayer.gc_ids = []
+    eventPlayer.gc_types = []
     
     wait(1, Wait.IGNORE_CONDITION)
     createInWorldText(getAllPlayers(), "Dummy{0}".format(" {0} x{1}".format(iconString(Icon.SKULL), eventPlayer.cursedMarkStacks) if eventPlayer.cursedMarkStacks > 0 else ""), eventPlayer, 2, Clip.SURFACES, WorldTextReeval.VISIBILITY_STRING_AND_COLOR, Color.WHITE)
+    eventPlayer.trackPersistentEntity(getLastCreatedText(), GcType.IN_WORLD_TEXT)
     eventPlayer.player_init = true

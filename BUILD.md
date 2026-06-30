@@ -29,6 +29,10 @@
 1. **Никогда не пиши `.active_buff_*.append(...)` или `.hud_buff_*.append(...)`
    вручную.** Используй макросы `trackBuff` / `applyVisibleDebuff` (см. рецепт A).
    Валидатор ловит ручные обходы (проверка D2).
+2. **Все глобальные сущности (Effects, Texts) должны отслеживаться.**
+   Запрещены сырые вызовы `createEffect`, `createInWorldText` без последующего 
+   сохранения ID через `applyVisibleDebuff`, `trackBuff` или `trackPersistentEntity`.
+   Валидатор запретит сборку при утечках памяти (проверка G).
 2. **Любой видимый эффект на игрока обязан иметь HUD-надпись.** Способ, который
    это гарантирует, — `applyVisibleDebuff` (механика + HUD одним вызовом).
 3. **Стат-эффект (SPEED/DAMAGE/HEALTH/DAMAGE_RECEIVED/HEALING_RECEIVED/
@@ -57,6 +61,9 @@
 
 Регистрируешь эффект → он сам уберётся и сам откатит стат. **Но только если ты
 зарегистрировал его правильно** (рецепты ниже).
+
+- **Мусорная корзина (Garbage Collection)** — `core/player_leave.opy`.
+  Хранит ID постоянных эффектов (`gc_ids`, `gc_types`), которые не являются временными баффами (например, текст статуса). Они автоматически уничтожаются при выходе игрока из матча. Регистрируй их через макрос `trackPersistentEntity`.
 
 ---
 
@@ -122,18 +129,15 @@ if BuffId.MY_X in victim.hud_buff_ids:
 
 ### C. Добавить НОВЫЙ стат (растёт с уровнем, баффается, имеет лимит)
 
-Самый опасный по числу швов. Пройди ВСЕ пункты:
+Новая компонентная архитектура (Base + Modifiers) делает это намного проще и безопаснее. Пройди пункты:
 
-- [ ] `playervar stat_X N` — `variables/player_vars.opy` (свободный слот).
-- [ ] Лимит: поле в enum `StatLimit` + макрос `statLimitX` (`array_schemas.opy`),
-      инициализация в `eventPlayer.stats_limit = [...]` (`core/init.opy`).
-- [ ] Инициализация `eventPlayer.stat_X = 100` **во ВСЕХ блоках init**: `Player Init`
-      И `Init Dummy Bot` (`core/init.opy`). Забыл бота — баг только на ботах.
-- [ ] Рост в `core/leveling.opy`, если стат растёт с уровнем.
-- [ ] Значение в `EffectType` (`settings/constants.opy`), если стат можно баффать.
-- [ ] **Ветка отката в `systems/effects_lifecycle.opy`** (в `elif` по `EffectType`):
-      вычесть `value` и применить (`setMoveSpeed`/`setDamageDealt`/...). **Без этой
-      ветки бафф стата никогда не откатится.** Валидатор это требует.
+- [ ] Добавь поле в конец enum `EffectType` (`settings/constants.opy`). **Важно:** значение в `EffectType` используется как индекс в массивах `base_stats` и `mod_stats`.
+- [ ] Добавь макросы `base_stat_X` и `mod_stat_X` в `array_schemas.opy` с индексом нового `EffectType`.
+- [ ] Добавь обновление нативного значения в макрос `apply_all_stats()` (например, `self.setMoveSpeed(max(0, self.base_stat_speed + self.mod_stat_speed))`).
+- [ ] Увеличь размер инициализатора массивов `base_stats` и `mod_stats` в `core/init.opy` **во ВСЕХ блоках init** (`Player Init` И `Init Dummy Bot`), добавив новый стартовый элемент (например, 100 для base, 0 для mod). Забыл бота — баг только на ботах. Валидатор ловит это.
+- [ ] Лимит: поле в enum `StatLimit` + макрос `statLimitX` (`array_schemas.opy`), обновление массива `stats_limit = [...]` в `init.opy`.
+- [ ] Если стат перманентно меняется (например, прокачка за уровень), изменяй **только** `base_stat_X` и вызывай `apply_all_stats()`.
+- [ ] Если стат баффается на время, просто используй `trackBuff`/`applyVisibleDebuff` с твоим `EffectType`. Система автоматически обновит `mod_stats` и вызовет `apply_all_stats()` при применении и истечении эффекта!
 - [ ] Отображение в `core/hud.opy`, если стат показывается.
 
 ### D. Добавить способность
@@ -158,8 +162,10 @@ if BuffId.MY_X in victim.hud_buff_ids:
 persistent-состояние:
 
 - [ ] Смерть (`@Event playerDied` в `core/respawn.opy`): сбрось/очисти.
-- [ ] Выход (`@Event playerLeftMatch` — правила пока НЕТ, создай при первой нужде):
-      удали локальные HUD/эффекты (иначе ghost-сущности, `CODESTYLE §6.5`).
+- [ ] Выход (`@Event playerLeft` в `core/player_leave.opy`):
+      Механизм GC уже чистит все трекаемые эффекты (баффы и `gc_ids`). Если твоё
+      состояние требует очистки помимо визуальных эффектов (сброс массивов,
+      влияющих на глобальную логику) — добавляй сюда.
 - [ ] Смена тира (`tier_up_reset`, пока заготовка): сбрось бонусы прошлого тира.
 
 ### F. Добавить зону
@@ -210,5 +216,8 @@ persistent-состояние:
   слота. Дай свободный.
 - **`ручной .append вне effects_lifecycle` (WARN)** — перепиши на `trackBuff` /
   `applyVisibleDebuff`.
+- **`Сырой вызов X не отслеживается`** — используй `trackPersistentEntity`, 
+  `trackBuff` или `applyVisibleDebuff` после создания эффекта, чтобы GC смог 
+  убрать его при выходе игрока.
 
 Полное описание каждой проверки — в шапке `tools/validate.py`.

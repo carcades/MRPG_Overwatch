@@ -2,9 +2,8 @@
 
 #Player variables
 
-playervar stat_damage 0
-playervar stat_health 1
-playervar stat_speed 2
+playervar base_stats 0
+playervar mod_stats 1
 playervar xp 3
 playervar level 4
 playervar current_tier 5
@@ -26,10 +25,11 @@ playervar bleeding_cost 29
 playervar vampire_cost 30
 playervar facingdirection 31
 playervar altar_status 36
-playervar stat_damage_received 37
-playervar status_text_id 38
-playervar stat_projectiles_speed 39
-playervar stat_healing_received 42
+
+playervar gc_ids 38
+playervar gc_types 40
+
+
 playervar ability_celestial_fire 43
 playervar status_text_pluses 47
 playervar is_selection_hero 48

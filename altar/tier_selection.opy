@@ -51,8 +51,8 @@ rule ">>>>>> Selection Tier-2 Race <<<<<<":
         eventPlayer.branch_data = [false, 150, 5, 10]
         
         # apply ash layer passive (20% dmg reduction)
-        eventPlayer.stat_damage_received = 80
-        eventPlayer.setDamageReceived(eventPlayer.stat_damage_received)
+        eventPlayer.base_stat_damage_received = 80
+        eventPlayer.apply_all_stats()
         
         # Add to HUD buff array
         eventPlayer.buff_append_args = [eventPlayer, 9999999, "{0} Ash Layer".format(iconString(Icon.SKULL)), Color.GRAY, BuffId.DEMON_ASH_LAYER]

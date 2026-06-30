@@ -9,6 +9,10 @@ def add_buff():
     eventPlayer.active_buff_types.append(eventPlayer.buff_append_args[3])
     eventPlayer.active_buff_actions.append(eventPlayer.buff_append_args[4])
     eventPlayer.active_buff_values.append(eventPlayer.buff_append_args[5])
+    if eventPlayer.buff_append_args[3] >= EffectType.SPEED:
+        if eventPlayer.buff_append_args[4] == EffectAction.SUBTRACT:
+            eventPlayer.mod_stats[eventPlayer.buff_append_args[3]] += eventPlayer.buff_append_args[5]
+            eventPlayer.apply_all_stats()
     logToInspector("LIFECYCLE: active_buffs count after add: {0}".format(len(eventPlayer.active_buff_ids)))
 
 
@@ -65,36 +69,11 @@ rule "Process player buffs":
                     logToInspector("LIFECYCLE: Removing EXISTENCE_PRAYER_OF_COURAGE flag")
                     eventPlayer.courageIsActive = false
                     eventPlayer.courageStacks = 0
-            elif eventPlayer.active_buff_types[eventPlayer.index_of_etbda_object] == EffectType.SPEED:
+            elif eventPlayer.active_buff_types[eventPlayer.index_of_etbda_object] >= EffectType.SPEED:
                 if eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.SUBTRACT:
-                    logToInspector("LIFECYCLE: Reverting SPEED change")
-                    eventPlayer.stat_speed -= eventPlayer.active_buff_values[eventPlayer.index_of_etbda_object]
-                    eventPlayer.setMoveSpeed(eventPlayer.stat_speed)
-            elif eventPlayer.active_buff_types[eventPlayer.index_of_etbda_object] == EffectType.DAMAGE:
-                if eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.SUBTRACT:
-                    logToInspector("LIFECYCLE: Reverting DAMAGE change")
-                    eventPlayer.stat_damage -= eventPlayer.active_buff_values[eventPlayer.index_of_etbda_object]
-                    eventPlayer.setDamageDealt(eventPlayer.stat_damage)
-            elif eventPlayer.active_buff_types[eventPlayer.index_of_etbda_object] == EffectType.HEALTH:
-                if eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.SUBTRACT:
-                    logToInspector("LIFECYCLE: Reverting HEALTH change")
-                    eventPlayer.stat_health -= eventPlayer.active_buff_values[eventPlayer.index_of_etbda_object]
-                    eventPlayer.setMaxHealth(eventPlayer.stat_health)
-            elif eventPlayer.active_buff_types[eventPlayer.index_of_etbda_object] == EffectType.DAMAGE_RECEIVED:
-                if eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.SUBTRACT:
-                    logToInspector("LIFECYCLE: Reverting DAMAGE_RECEIVED change")
-                    eventPlayer.stat_damage_received -= eventPlayer.active_buff_values[eventPlayer.index_of_etbda_object]
-                    eventPlayer.setDamageReceived(100 if eventPlayer.stat_damage_received == 0 else eventPlayer.stat_damage_received)
-            elif eventPlayer.active_buff_types[eventPlayer.index_of_etbda_object] == EffectType.HEALING_RECEIVED:
-                if eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.SUBTRACT:
-                    logToInspector("LIFECYCLE: Reverting HEALING_RECEIVED change")
-                    eventPlayer.stat_healing_received -= eventPlayer.active_buff_values[eventPlayer.index_of_etbda_object]
-                    eventPlayer.setHealingReceived(100 if eventPlayer.stat_healing_received == 0 else eventPlayer.stat_healing_received)
-            elif eventPlayer.active_buff_types[eventPlayer.index_of_etbda_object] == EffectType.PROJECTILE_SPEED:
-                if eventPlayer.active_buff_actions[eventPlayer.index_of_etbda_object] == EffectAction.SUBTRACT:
-                    logToInspector("LIFECYCLE: Reverting PROJECTILE_SPEED change")
-                    eventPlayer.stat_projectiles_speed -= eventPlayer.active_buff_values[eventPlayer.index_of_etbda_object]
-                    eventPlayer.setProjectileSpeed(100 if eventPlayer.stat_projectiles_speed == 0 else eventPlayer.stat_projectiles_speed)
+                    logToInspector("LIFECYCLE: Reverting STAT change")
+                    eventPlayer.mod_stats[eventPlayer.active_buff_types[eventPlayer.index_of_etbda_object]] -= eventPlayer.active_buff_values[eventPlayer.index_of_etbda_object]
+                    eventPlayer.apply_all_stats()
             #delete expired buff from array
             logToInspector("LIFECYCLE: Deleting from active_buffs index {0}".format(eventPlayer.index_of_etbda_object))
             del eventPlayer.active_buff_ids[eventPlayer.index_of_etbda_object]

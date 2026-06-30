@@ -162,6 +162,33 @@ macro Player.dwCurseDamageBonus = self.branch_data[DemonicBranchData.CURSE_DAMAG
 
 
 # ============================================================
+# СХЕМЫ МАССИВОВ — PLAYER STATS (Base + Modifiers)
+# ============================================================
+# base_stats and mod_stats are 10-element arrays indexed by EffectType
+macro Player.base_stat_speed = self.base_stats[EffectType.SPEED]
+macro Player.base_stat_damage = self.base_stats[EffectType.DAMAGE]
+macro Player.base_stat_health = self.base_stats[EffectType.HEALTH]
+macro Player.base_stat_damage_received = self.base_stats[EffectType.DAMAGE_RECEIVED]
+macro Player.base_stat_healing_received = self.base_stats[EffectType.HEALING_RECEIVED]
+macro Player.base_stat_projectiles_speed = self.base_stats[EffectType.PROJECTILE_SPEED]
+
+macro Player.mod_stat_speed = self.mod_stats[EffectType.SPEED]
+macro Player.mod_stat_damage = self.mod_stats[EffectType.DAMAGE]
+macro Player.mod_stat_health = self.mod_stats[EffectType.HEALTH]
+macro Player.mod_stat_damage_received = self.mod_stats[EffectType.DAMAGE_RECEIVED]
+macro Player.mod_stat_healing_received = self.mod_stats[EffectType.HEALING_RECEIVED]
+macro Player.mod_stat_projectiles_speed = self.mod_stats[EffectType.PROJECTILE_SPEED]
+
+macro Player.apply_all_stats():
+    self.setMoveSpeed(max(0, self.base_stat_speed + self.mod_stat_speed))
+    self.setDamageDealt(max(0, self.base_stat_damage + self.mod_stat_damage))
+    self.setMaxHealth(max(1, self.base_stat_health + self.mod_stat_health))
+    self.setDamageReceived(max(0, self.base_stat_damage_received + self.mod_stat_damage_received))
+    self.setHealingReceived(max(0, self.base_stat_healing_received + self.mod_stat_healing_received))
+    self.setProjectileSpeed(max(0, self.base_stat_projectiles_speed + self.mod_stat_projectiles_speed))
+
+
+# ============================================================
 # ЕДИНЫЙ API ЭФФЕКТОВ — макросы регистрации баффов/дебаффов
 # ============================================================
 # ЗАЧЕМ: централизованный add_buff() умеет работать только над eventPlayer,
@@ -191,6 +218,10 @@ macro Player.trackBuff(buffId, target, expire, type, action, value):
     self.active_buff_types.append(type)
     self.active_buff_actions.append(action)
     self.active_buff_values.append(value)
+    if type >= EffectType.SPEED:
+        if action == EffectAction.SUBTRACT:
+            self.mod_stats[type] += value
+            self.apply_all_stats()
 
 # --- Регистрация HUD-надписи об эффекте (правый список) ---
 macro Player.trackHud(buffId, expire, name, color):
@@ -214,4 +245,13 @@ macro Player.applyVisibleDebuff(buffId, target, expire, type, action, value, nam
     self.hud_buff_expires.append(expire)
     self.hud_buff_names.append(name)
     self.hud_buff_colors.append(color)
+    if type >= EffectType.SPEED:
+        if action == EffectAction.SUBTRACT:
+            self.mod_stats[type] += value
+            self.apply_all_stats()
 
+
+# --- Регистрация перманентного эффекта (Garbage Collector) ---
+macro Player.trackPersistentEntity(entity_id, gc_type):
+    self.gc_ids.append(entity_id)
+    self.gc_types.append(gc_type)

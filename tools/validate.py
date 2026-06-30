@@ -242,6 +242,7 @@ class Index:
     buff_calls: list = field(default_factory=list)         # [BuffCall]
     enum_refs: dict = field(default_factory=dict)          # EnumName -> set(used members)
     manual_appends: list = field(default_factory=list)     # [(rel, line, array_part)]
+    legacy_vars: list = field(default_factory=list)        # [(rel, line, var_name)]
 
 
 def _literal_element_count(text: str, open_bracket_pos: int) -> int:
@@ -363,6 +364,8 @@ def _line_of_offset(lines: list, offset: int) -> int:
 def parse_files(files: list) -> Index:
     idx = Index()
 
+    LEGACY_STAT_RE = re.compile(r"(?<!base_)(?<!mod_)(?<!\w)stat_(damage|health|speed|damage_received|healing_received|projectiles_speed)\b")
+
     for sf in files:
         text = sf.raw
         lines = sf.lines
@@ -370,6 +373,12 @@ def parse_files(files: list) -> Index:
         # --- Объявления слотов (3 пула) ---
         for lineno, line in enumerate(lines, start=1):
             code = strip_inline_comment(line)
+            
+            # check for legacy stat variables
+            m_leg = LEGACY_STAT_RE.search(code)
+            if m_leg:
+                idx.legacy_vars.append((sf.rel_path, lineno, "stat_" + m_leg.group(1)))
+                
             # маркер намеренной заготовки в хвостовом комментарии: `# stub`
             comment = line[len(code):]
             is_stub = bool(re.search(r"#\s*stub\b", comment, re.IGNORECASE))
@@ -837,6 +846,61 @@ def check_hud_linkage(idx: Index) -> list:
     return findings
 
 
+def check_entity_leaks(idx: Index) -> list:
+    """G. Защита от утечек памяти (Garbage Collection).
+    
+    Любой вызов createEffect, createInWorldText и т.д. вне глобальных/декоративных 
+    файлов должен сопровождаться трекингом (использованием getLastCreatedEntity 
+    или getLastCreatedText в течение следующих 5 строк) для регистрации в GC.
+    """
+    findings = []
+    banned_calls = {"createEffect", "createInWorldText", "createHudText", "createIcon", "createBeamEffect", "createProgressBarHud"}
+    whitelist = {"systems/effects_lifecycle.opy", "core/hud.opy", "variables/subroutines.opy", "debug/test_rules.opy"}
+    
+    calls_by_file = {}
+    for name, rel, line in idx.calls:
+        if name in banned_calls:
+            calls_by_file.setdefault(rel, []).append((name, line))
+            
+    for rel, calls in calls_by_file.items():
+        if rel in whitelist or rel.endswith("effects.opy"):
+            continue
+            
+        abs_path = os.path.join(PROJECT_ROOT, rel)
+        if not os.path.isfile(abs_path):
+            continue
+        with open(abs_path, "r", encoding="utf-8") as f:
+            lines = norm_line_endings(f.read()).split("\n")
+            
+        for name, line in calls:
+            tracked = False
+            # Смотрим текущую строку и 5 следующих
+            for i in range(line - 1, min(line + 5, len(lines))):
+                code = strip_inline_comment(lines[i])
+                if "getLastCreatedEntity" in code or "getLastCreatedText" in code:
+                    tracked = True
+                    break
+            
+            if not tracked:
+                findings.append(Finding("ERROR", rel, line,
+                    f"Сырой вызов {name}() не отслеживается. Сохраните ID через getLastCreatedEntity()/Text() в систему очистки (например, trackPersistentEntity), иначе эффект останется в памяти при выходе игрока."))
+                    
+    return findings
+
+
+def check_legacy_stat_vars(idx: Index) -> list:
+    """H. Запрет на старые переменные статов.
+    
+    Вся работа со статами переведена на архитектуру Base + Modifiers. Прямое обращение
+    к stat_speed, stat_damage и т.д. вызывает рассинхрон системы и баги перезаписи.
+    """
+    findings = []
+    for rel, line, varname in idx.legacy_vars:
+        findings.append(Finding("ERROR", rel, line,
+            f"Использование устаревшей переменной '{varname}'. Используйте base_stat_* или mod_stat_*, и обновляйте через apply_all_stats() / trackBuff()."))
+    return findings
+
+
 # --- Реестр и раннер ---------------------------------------------------------
 
 CHECKS = [
@@ -847,6 +911,8 @@ CHECKS = [
     ("D2. обход API", check_manual_buff_appends),
     ("E. арность buff_append_args", check_buff_arity),
     ("F. HUD-связность", check_hud_linkage),
+    ("G. Утечки памяти (GC)", check_entity_leaks),
+    ("H. Устаревшие статы", check_legacy_stat_vars),
 ]
 
 

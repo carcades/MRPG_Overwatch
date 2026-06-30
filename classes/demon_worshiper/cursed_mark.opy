@@ -9,7 +9,7 @@ rule "Demon Worshiper: Apply Cursed Mark Stack":
     victim.cursedMarkDamagePool += eventDamage
     
     # Check if accumulated damage exceeds dynamic threshold
-    if victim.cursedMarkDamagePool >= (eventPlayer.dwCurseBaseThreshold * (eventPlayer.stat_damage / 100)):
+    if victim.cursedMarkDamagePool >= (eventPlayer.dwCurseBaseThreshold * ((eventPlayer.base_stat_damage + eventPlayer.mod_stat_damage) / 100)):
         # Reset damage pool
         victim.cursedMarkDamagePool = 0
         
@@ -27,15 +27,14 @@ rule "Demon Worshiper: Apply Cursed Mark Stack":
             victim.cursedMarkStacks++
             
             # Increase damage received and register/update stat buff to global system
-            victim.stat_damage_received += eventPlayer.dwCurseDamageBonus
-            victim.setDamageReceived(100 if victim.stat_damage_received == 0 else victim.stat_damage_received)
-            
             if victim.cursedMarkStacks == 1:
                 # Register new stat buff
                 victim.trackBuff(BuffId.CURSED_MARK_STAT, victim, getTotalTimeElapsed() + eventPlayer.dwCurseDuration, EffectType.DAMAGE_RECEIVED, EffectAction.SUBTRACT, eventPlayer.dwCurseDamageBonus)
             else:
                 # Update existing stat buff value
                 victim.active_buff_values[victim.active_buff_ids.index(BuffId.CURSED_MARK_STAT)] += eventPlayer.dwCurseDamageBonus
+                victim.mod_stat_damage_received += eventPlayer.dwCurseDamageBonus
+                victim.apply_all_stats()
             
         # Set/refresh expiration timestamp
         victim.cursedMarkExpire = getTotalTimeElapsed() + eventPlayer.dwCurseDuration

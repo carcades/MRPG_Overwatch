@@ -9,7 +9,7 @@ def create_status_text():
     @Name "Sub: Create status text"
     
     createInWorldText(([] if eventPlayer.current_zone in [Zone.ALTAR, Zone.BLOOD_SHOP, Zone.UNDERGROUND, Zone.RELIC_TREASURY] else eventPlayer.current_race[3]), "{0}{1}".format(eventPlayer.current_race[0], " {0} x{1}".format(iconString(Icon.SKULL), eventPlayer.cursedMarkStacks) if localPlayer.altar_status == AltarStatus.DEMON_WORSHIPER and eventPlayer.cursedMarkStacks > 0 else ""), eventPlayer, eventPlayer.current_race[1], Clip.SURFACES, WorldTextReeval.VISIBILITY_STRING_AND_COLOR, eventPlayer.current_race[2])
-    eventPlayer.status_text_id = getLastCreatedText()
+    eventPlayer.trackPersistentEntity(getLastCreatedText(), GcType.IN_WORLD_TEXT)
 
 
 def race_change_tp():

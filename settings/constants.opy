@@ -60,3 +60,11 @@ enum BuffId:
     CURSED_MARK_VISUAL,
     CURSED_MARK_STAT,
     BLEEDING
+
+enum GcType:
+    EFFECT = 0,
+    IN_WORLD_TEXT,
+    HUD_TEXT,
+    ICON,
+    BEAM,
+    PROGRESS_BAR

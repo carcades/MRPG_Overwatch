@@ -6,18 +6,18 @@ rule "Shop buy damage":
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     @Condition eventPlayer.level_up_points >= 1
     
-    if eventPlayer.stat_damage < eventPlayer.statLimitDamage:
+    if eventPlayer.base_stat_damage < eventPlayer.statLimitDamage:
         if eventPlayer.isHoldingButton(Button.CROUCH):
-            eventPlayer.stat_damage++
+            eventPlayer.base_stat_damage++
             eventPlayer.level_up_points--
-            eventPlayer.setDamageDealt(eventPlayer.stat_damage)
+            eventPlayer.apply_all_stats()
             wait(0.016)
             if ruleCondition:
                 loop()
         else:
-            eventPlayer.stat_damage++
+            eventPlayer.base_stat_damage++
             eventPlayer.level_up_points--
-            eventPlayer.setDamageDealt(eventPlayer.stat_damage)
+            eventPlayer.apply_all_stats()
     else:
         smallMessage(eventPlayer, "You have reached the limit of your race")
 
@@ -28,18 +28,18 @@ rule "Shop buy health":
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     @Condition eventPlayer.level_up_points >= 1
     
-    if eventPlayer.stat_health < eventPlayer.statLimitHealth:
+    if eventPlayer.base_stat_health < eventPlayer.statLimitHealth:
         if eventPlayer.isHoldingButton(Button.CROUCH):
-            eventPlayer.stat_health++
+            eventPlayer.base_stat_health++
             eventPlayer.level_up_points--
-            eventPlayer.setMaxHealth(eventPlayer.stat_health)
+            eventPlayer.apply_all_stats()
             wait(0.016)
             if ruleCondition:
                 loop()
         else:
-            eventPlayer.stat_health++
+            eventPlayer.base_stat_health++
             eventPlayer.level_up_points--
-            eventPlayer.setMaxHealth(eventPlayer.stat_health)
+            eventPlayer.apply_all_stats()
     else:
         smallMessage(eventPlayer, "You have reached the limit of your race")
 
@@ -50,17 +50,17 @@ rule "Shop buy speed":
     @Condition eventPlayer.isHoldingButton(Button.INTERACT) == true
     @Condition eventPlayer.level_up_points >= 1
     
-    if eventPlayer.stat_speed < eventPlayer.statLimitSpeed:
+    if eventPlayer.base_stat_speed < eventPlayer.statLimitSpeed:
         if eventPlayer.isHoldingButton(Button.CROUCH):
-            eventPlayer.stat_speed += 0.25
+            eventPlayer.base_stat_speed += 0.25
             eventPlayer.level_up_points--
-            eventPlayer.setMoveSpeed(eventPlayer.stat_speed)
+            eventPlayer.apply_all_stats()
             wait(0.016)
             if ruleCondition:
                 loop()
         else:
-            eventPlayer.stat_speed += 0.25
+            eventPlayer.base_stat_speed += 0.25
             eventPlayer.level_up_points--
-            eventPlayer.setMoveSpeed(eventPlayer.stat_speed)
+            eventPlayer.apply_all_stats()
     else:
         smallMessage(eventPlayer, "You have reached the limit of your race")

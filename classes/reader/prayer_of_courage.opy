@@ -75,9 +75,7 @@ rule "Reader Ability: prayer of courage":
                 smallMessage(eventPlayer, "courage stack added: {0}".format(eventPlayer.courageStacks))
                 
                 #add damage
-                eventPlayer.courageDamageBonus = evalOnce(eventPlayer.stat_damage * 0.1)
-                eventPlayer.stat_damage += eventPlayer.courageDamageBonus
-                eventPlayer.setDamageDealt(eventPlayer.stat_damage)
+                eventPlayer.courageDamageBonus = evalOnce((eventPlayer.base_stat_damage + eventPlayer.mod_stat_damage) * 0.1)
                 eventPlayer.buff_append_args = [BuffId.COURAGE_DAMAGE, eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.DAMAGE, EffectAction.SUBTRACT, eventPlayer.courageDamageBonus]
                 add_buff()
             else:
