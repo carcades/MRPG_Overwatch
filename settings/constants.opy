@@ -43,7 +43,7 @@ enum EffectType:
     PROJECTILE_SPEED
 
 enum EffectAction:
-    SUBTRACT = 0,
+    MODIFY_STAT = 0,
     EXISTENCE_PRAYER_OF_SALVATION,
     EXISTENCE_PRAYER_OF_COURAGE
 

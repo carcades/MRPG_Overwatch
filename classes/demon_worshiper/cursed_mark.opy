@@ -29,7 +29,7 @@ rule "Demon Worshiper: Apply Cursed Mark Stack":
             # Increase damage received and register/update stat buff to global system
             if victim.cursedMarkStacks == 1:
                 # Register new stat buff
-                victim.trackBuff(BuffId.CURSED_MARK_STAT, victim, getTotalTimeElapsed() + eventPlayer.dwCurseDuration, EffectType.DAMAGE_RECEIVED, EffectAction.SUBTRACT, eventPlayer.dwCurseDamageBonus)
+                victim.trackBuff(BuffId.CURSED_MARK_STAT, victim, getTotalTimeElapsed() + eventPlayer.dwCurseDuration, EffectType.DAMAGE_RECEIVED, EffectAction.MODIFY_STAT, eventPlayer.dwCurseDamageBonus)
             else:
                 # Update existing stat buff value
                 victim.active_buff_values[victim.active_buff_ids.index(BuffId.CURSED_MARK_STAT)] += eventPlayer.dwCurseDamageBonus

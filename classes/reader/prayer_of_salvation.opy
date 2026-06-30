@@ -88,7 +88,7 @@ rule "Reader Ability: prayer for salvation":
                 
                 #add speed
                 eventPlayer.prayerSpeedBonus = evalOnce((eventPlayer.base_stat_speed + eventPlayer.mod_stat_speed) * (0.2 + ((eventPlayer.current_tier - 1) * 0.1)))
-                eventPlayer.buff_append_args = [BuffId.PRAYER_SPEED, eventPlayer, getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.SPEED, EffectAction.SUBTRACT, eventPlayer.prayerSpeedBonus]
+                eventPlayer.buff_append_args = [BuffId.PRAYER_SPEED, eventPlayer, getTotalTimeElapsed() + eventPlayer.prayerDuration, EffectType.SPEED, EffectAction.MODIFY_STAT, eventPlayer.prayerSpeedBonus]
                 add_buff()
             else:
                 smallMessage(eventPlayer, "max prayer stacks reached. duration extended.")

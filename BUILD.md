@@ -76,7 +76,7 @@
 ```python
 # СТАТ-эффект (нужны action + value):
 victim.applyVisibleDebuff(BuffId.MY_STAT, victim, getTotalTimeElapsed() + duration,
-    EffectType.DAMAGE_RECEIVED, EffectAction.SUBTRACT, bonusValue,
+    EffectType.DAMAGE_RECEIVED, EffectAction.MODIFY_STAT, bonusValue,
     "{0} My Debuff".format(iconString(Icon.SKULL)), Color.PURPLE)
 
 # ВИЗУАЛЬНЫЙ эффект-сущность (action/value не нужны -> 0, 0):

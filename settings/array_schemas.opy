@@ -219,9 +219,8 @@ macro Player.trackBuff(buffId, target, expire, type, action, value):
     self.active_buff_actions.append(action)
     self.active_buff_values.append(value)
     if type >= EffectType.SPEED:
-        if action == EffectAction.SUBTRACT:
-            self.mod_stats[type] += value
-            self.apply_all_stats()
+        self.mod_stats[type] += value
+        self.apply_all_stats()
 
 # --- Регистрация HUD-надписи об эффекте (правый список) ---
 macro Player.trackHud(buffId, expire, name, color):
@@ -246,9 +245,8 @@ macro Player.applyVisibleDebuff(buffId, target, expire, type, action, value, nam
     self.hud_buff_names.append(name)
     self.hud_buff_colors.append(color)
     if type >= EffectType.SPEED:
-        if action == EffectAction.SUBTRACT:
-            self.mod_stats[type] += value
-            self.apply_all_stats()
+        self.mod_stats[type] += value
+        self.apply_all_stats()
 
 
 # --- Регистрация перманентного эффекта (Garbage Collector) ---
