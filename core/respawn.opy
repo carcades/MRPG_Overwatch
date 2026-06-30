@@ -21,6 +21,9 @@ rule "Remove negative effects after death":
     @Event playerDied
     
     eventPlayer.stopAllDamageOverTime()
+    # Force all active buffs to expire immediately so lifecycle loop cleans them up and reverts stats safely
+    eventPlayer.active_buff_expire_times = [0 for x in eventPlayer.active_buff_expire_times]
+    eventPlayer.hud_buff_expires = [0 for x in eventPlayer.hud_buff_expires]
 
 
 
