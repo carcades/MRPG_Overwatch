@@ -35,6 +35,8 @@ rule "Player Init":
     eventPlayer.stat_speed = 100
     eventPlayer.stat_damage_received = 100
     eventPlayer.stat_projectiles_speed = 100
+    #passives init: [VAMP_PASSIVE, VAMP_SIZE, VAMP_LEVEL, BLEED_PASSIVE, BLEED_CHANCE, BLEED_CD, BLEED_DURATION, BLEED_POWER, BLEED_CHANCE_PLAYER, BLEED_LEVEL, CURSED_MARK_STACKS, CURSED_MARK_EXPIRE, CURSED_MARK_DAMAGE_POOL, CURSED_MARK_EFFECT_ID, IS_RECEIVING_BLEED_DAMAGE]
+    eventPlayer.passives_data = [false, 0, 0, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false]
     #currency
     eventPlayer.level_up_points = 100
     #xp mining init
@@ -148,7 +150,10 @@ rule "Init Dummy Bot for Testing":
     eventPlayer.stat_speed = 100
     eventPlayer.stat_damage_received = 100
     eventPlayer.stat_projectiles_speed = 100
-    
+
+    # Passives init (нужно до чтения cursedMarkStacks ниже): см. enum PassivesData
+    eventPlayer.passives_data = [false, 0, 0, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false]
+
     # Buff arrays init
     eventPlayer.active_buff_ids = []
     eventPlayer.active_buff_targets = []

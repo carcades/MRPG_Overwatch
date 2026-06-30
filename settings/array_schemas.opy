@@ -160,3 +160,58 @@ macro Player.dwCurseBaseThreshold = self.branch_data[DemonicBranchData.CURSE_BAS
 macro Player.dwCurseDuration = self.branch_data[DemonicBranchData.CURSE_DURATION]
 macro Player.dwCurseDamageBonus = self.branch_data[DemonicBranchData.CURSE_DAMAGE_BONUS]
 
+
+# ============================================================
+# ЕДИНЫЙ API ЭФФЕКТОВ — макросы регистрации баффов/дебаффов
+# ============================================================
+# ЗАЧЕМ: централизованный add_buff() умеет работать только над eventPlayer,
+# поэтому любой дебафф на ЧУЖОГО игрока (victim) раньше требовал 6-12 ручных
+# .append (см. историю cursed_mark) — и любой из них можно было забыть.
+# Эти макросы работают на self -> вызывай на ЛЮБОЙ цели:
+#     victim.applyVisibleDebuff(...)   eventPlayer.trackBuff(...)   bot.trackBuff(...)
+# Нулевой оверхед: макрос = текстовая подстановка, разворачивается в те же .append.
+#
+# >>> ПОСЛЕ добавления этих макросов ОБЯЗАТЕЛЬНО скомпилируй проект один раз
+# >>> в OverPy (VS Code) и убедись, что нет ошибок синтаксиса макросов. <<<
+#
+# КОНТРАКТ длины (тот же, что проверяет tools/validate.py):
+#   тип эффекта -> сколько полей реально нужно
+#     ENTITY / HEALTH_BAR / HEAL_OVER_TIME : action/value не используются (передавай 0, 0)
+#     PLAYER_VARIABLE                      : нужен action (value = 0)
+#     стат-типы (SPEED/DAMAGE/HEALTH/...)   : нужны И action, И value (иначе стат
+#                                            «восстановится на 0» = тихая порча стата)
+
+# --- Механическая регистрация эффекта в системе жизненного цикла ---
+# Эквивалент add_buff(), но на любой цели. Всегда передавай ВСЕ 6 аргументов
+# (для не-стат-типов action=0, value=0) — это убирает зависимость от тихого OOB→0.
+macro Player.trackBuff(buffId, target, expire, type, action, value):
+    self.active_buff_ids.append(buffId)
+    self.active_buff_targets.append(target)
+    self.active_buff_expire_times.append(expire)
+    self.active_buff_types.append(type)
+    self.active_buff_actions.append(action)
+    self.active_buff_values.append(value)
+
+# --- Регистрация HUD-надписи об эффекте (правый список) ---
+macro Player.trackHud(buffId, expire, name, color):
+    self.hud_buff_ids.append(buffId)
+    self.hud_buff_expires.append(expire)
+    self.hud_buff_names.append(name)
+    self.hud_buff_colors.append(color)
+
+# --- ВИДИМЫЙ дебафф/бафф: механика + HUD за ОДИН вызов ---
+# Используй ЭТО для любого эффекта, который игрок должен видеть. HUD физически
+# невозможно забыть — он в том же макросе. Инлайнит trackBuff+trackHud (без
+# вложенных вызовов макросов — максимально безопасно для компилятора).
+macro Player.applyVisibleDebuff(buffId, target, expire, type, action, value, name, color):
+    self.active_buff_ids.append(buffId)
+    self.active_buff_targets.append(target)
+    self.active_buff_expire_times.append(expire)
+    self.active_buff_types.append(type)
+    self.active_buff_actions.append(action)
+    self.active_buff_values.append(value)
+    self.hud_buff_ids.append(buffId)
+    self.hud_buff_expires.append(expire)
+    self.hud_buff_names.append(name)
+    self.hud_buff_colors.append(color)
+

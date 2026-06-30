@@ -28,10 +28,11 @@ rule ">>>>>> Selection Tier-2 Race <<<<<<":
         wait(5, Wait.ABORT_WHEN_FALSE)
         eventPlayer.altar_status = AltarStatus.READER
         eventPlayer.current_race = ["Reader", 2, rgb(125, 155, 235), getAllPlayers()]
-        # angelic branch data: [abilities, prayer_iter, holy_circle_iter, holy_circle_iter_plus, 
+        # angelic branch data: [abilities, prayer_iter, holy_circle_iter, holy_circle_iter_plus,
         #                       salv_progress, salv_cast_dur, salv_can_cast_moving, salv_is_active, salv_speed_bonus, salv_duration, salv_original_cast_dur, salv_sound,
-        #                       cour_progress, cour_cast_dur, cour_can_cast_moving, cour_added_dmg_received, cour_added_damage, cour_duration, cour_original_cast_dur, cour_sound]
-        eventPlayer.branch_data = [true, 0, 0, 0, 0, 0, false, false, 0, 0, 0, null, 0, 0, false, 0, 0, 0, 0, null]
+        #                       cour_progress, cour_cast_dur, cour_can_cast_moving, cour_added_dmg_received, cour_added_damage, cour_duration, cour_original_cast_dur, cour_sound,
+        #                       cour_is_active, cour_iter, salv_stacks, cour_stacks]
+        eventPlayer.branch_data = [true, 0, 0, 0, 0, 0, false, false, 0, 0, 0, null, 0, 0, false, 0, 0, 0, 0, null, false, 0, 0, 0]
         
         # nested arrays
         eventPlayer.branch_t1_hud_ids = [null, null]

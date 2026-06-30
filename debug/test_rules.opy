@@ -195,3 +195,4 @@ rule "Debug: Destroy Floating Damage Numbers":
     wait(0.1)
     if len(eventPlayer.test_arr_1) > 0:
         loop()
+
