@@ -248,6 +248,14 @@ macro Player.applyVisibleDebuff(buffId, target, expire, type, action, value, nam
         self.mod_stats[type] += value
         self.apply_all_stats()
 
+# --- Продление баффа по ID ---
+# Безопасное атомарное продление баффа и HUD-надписи по индексу.
+macro Player.extendBuff(buffId, newExpire):
+    if buffId in self.hud_buff_ids:
+        self.hud_buff_expires[self.hud_buff_ids.index(buffId)] = newExpire
+    if buffId in self.active_buff_ids:
+        self.active_buff_expire_times[self.active_buff_ids.index(buffId)] = newExpire
+
 
 # --- Регистрация перманентного эффекта (Garbage Collector) ---
 macro Player.trackPersistentEntity(entity_id, gc_type):

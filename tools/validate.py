@@ -178,9 +178,9 @@ ENUM_REF_RE = re.compile(r"\b([A-Z][A-Za-z0-9_]*)\.([A-Z][A-Z0-9_]*)\b")
 LITERAL_MEMBER_RE = re.compile(r"([A-Za-z_]\w*)\.([a-z_]\w*)\s*=\s*\[")
 # присвоение литерала массива bare (глобал):  <var> = [
 LITERAL_BARE_RE = re.compile(r"(?<![A-Za-z0-9_\.])([a-z_]\w*)\s*=\s*\[")
-# ручной append в active_buff_*:  <obj>.active_buff_ids.append(
-MANUAL_APPEND_RE = re.compile(
-    r"\.active_buff_(ids|targets|expire_times|types|actions|values)\s*\.\s*append\s*\("
+# ручная мутация active_buff_* или hud_buff_*:  <obj>.active_buff_ids.append( или <obj>.active_buff_expire_times[i] =
+MANUAL_MUTATION_RE = re.compile(
+    r"\b(active_buff_|hud_buff_)[a-z_]+\s*(?:\.\s*append\s*\(|\[[^\]]+\]\s*=)"
 )
 BUFF_APPEND_ASSIGN_RE = re.compile(r"\.buff_append_args\s*=\s*\[")
 BUFF_CALL_RE = re.compile(r"(?<![A-Za-z0-9_\.])(add_buff|add_hud_buff|extend_buff)\s*\(")
@@ -241,7 +241,7 @@ class Index:
     buff_appends: list = field(default_factory=list)       # [BuffAppend]
     buff_calls: list = field(default_factory=list)         # [BuffCall]
     enum_refs: dict = field(default_factory=dict)          # EnumName -> set(used members)
-    manual_appends: list = field(default_factory=list)     # [(rel, line, array_part)]
+    manual_mutations: list = field(default_factory=list)   # [(rel, line, array_part)]
     legacy_vars: list = field(default_factory=list)        # [(rel, line, var_name)]
 
 
@@ -510,12 +510,12 @@ def parse_files(files: list) -> Index:
                 enum_name, member = m.group(1), m.group(2)
                 idx.enum_refs.setdefault(enum_name, set()).add(member)
 
-        # --- ручные append в active_buff_* (обход инфраструктуры) ---
+        # --- ручные мутации active_buff_* (обход инфраструктуры) ---
         for lineno, line in enumerate(lines, start=1):
             code = strip_inline_comment(line)
-            m = MANUAL_APPEND_RE.search(code)
+            m = MANUAL_MUTATION_RE.search(code)
             if m:
-                idx.manual_appends.append((sf.rel_path, lineno, m.group(1)))
+                idx.manual_mutations.append((sf.rel_path, lineno, m.group(1)))
 
     return idx
 
@@ -712,19 +712,19 @@ def _first_ref_loc(idx: Index, enum_name: str, member: str):
 
 
 def check_manual_buff_appends(idx: Index) -> list:
-    """D2. Ручной append в active_buff_* вне центральной инфраструктуры.
+    """D2. Ручная мутация active_buff_* или hud_buff_* вне центральной инфраструктуры.
 
-    CODESTYLE §4 требует использовать add_buff(). Прямой .append() в
-    active_buff_* массивы минует централизованную систему очистки/удаления.
-    Разрешено только в BUFF_API_FILES (effects_lifecycle.opy).
+    CODESTYLE §4 требует использовать API макросов. Прямой .append() или перезапись по индексу []=
+    в active_buff_* массивы минует инкапсуляцию.
+    Разрешено только в BUFF_API_FILES (effects_lifecycle.opy, array_schemas.opy).
     """
     findings = []
-    for rel, line, part in idx.manual_appends:
+    for rel, line, part in idx.manual_mutations:
         if rel in BUFF_API_FILES:
             continue
-        findings.append(Finding("WARN", rel, line,
-            f"ручной .append в active_buff_{part} вне effects_lifecycle — обход add_buff() API; "
-            f"используй add_buff() или расширь централизованную инфраструктуру"))
+        findings.append(Finding("ERROR", rel, line,
+            f"ручная мутация {part}* вне API макросов (обнаружен .append или присвоение по индексу); "
+            f"используй trackBuff, applyVisibleDebuff или extendBuff"))
     return findings
 
 

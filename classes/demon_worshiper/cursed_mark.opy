@@ -39,17 +39,9 @@ rule "Demon Worshiper: Apply Cursed Mark Stack":
         # Set/refresh expiration timestamp
         victim.cursedMarkExpire = getTotalTimeElapsed() + eventPlayer.dwCurseDuration
         
-        # Extend HUD buff
-        if BuffId.CURSED_MARK_VISUAL in victim.hud_buff_ids:
-            victim.hud_buff_expires[victim.hud_buff_ids.index(BuffId.CURSED_MARK_VISUAL)] = victim.cursedMarkExpire
-            
-        # Extend Visual Buff
-        if BuffId.CURSED_MARK_VISUAL in victim.active_buff_ids:
-            victim.active_buff_expire_times[victim.active_buff_ids.index(BuffId.CURSED_MARK_VISUAL)] = victim.cursedMarkExpire
-            
-        # Extend Stat Buff
-        if BuffId.CURSED_MARK_STAT in victim.active_buff_ids:
-            victim.active_buff_expire_times[victim.active_buff_ids.index(BuffId.CURSED_MARK_STAT)] = victim.cursedMarkExpire
+        # Extend Buffs
+        victim.extendBuff(BuffId.CURSED_MARK_VISUAL, victim.cursedMarkExpire)
+        victim.extendBuff(BuffId.CURSED_MARK_STAT, victim.cursedMarkExpire)
         
         # Audio feedback for stack refresh
         playEffect(getAllPlayers(), DynamicEffect.DEBUFF_IMPACT_SOUND, Color.WHITE, victim, 100)
