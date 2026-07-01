@@ -5,7 +5,7 @@ rule "Show description":
     @Condition eventPlayer.current_zone == Zone.ALTAR
     @Condition eventPlayer.isHoldingButton(Button.CROUCH) == true
     
-    eventPlayer.description_visibility_status = 1
+    eventPlayer.descriptionVisibility = AltarDescVisibility.DESCRIPTION
 
 
 rule "Hide description":
@@ -13,7 +13,7 @@ rule "Hide description":
     @Condition eventPlayer.current_zone == Zone.ALTAR
     @Condition eventPlayer.isHoldingButton(Button.CROUCH) == false
     
-    eventPlayer.description_visibility_status = 0
+    eventPlayer.descriptionVisibility = AltarDescVisibility.TITLE
 
 
 rule ">>>>>> Selection Tier-2 Race <<<<<<":

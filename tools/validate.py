@@ -43,6 +43,7 @@ MAX_SLOT = 127
 BUFF_API_FILES = {
     "systems/effects_lifecycle.opy",
     "settings/array_schemas.opy",
+    "core/respawn.opy",
 }
 
 # Арность buff_append_args в зависимости от целевой подпрограммы.
@@ -145,8 +146,12 @@ def load_files(rel_paths: list) -> list:
     files = []
     for rel in rel_paths:
         abs_path = os.path.join(PROJECT_ROOT, rel)
-        with open(abs_path, "r", encoding="utf-8") as f:
-            raw = f.read()
+        try:
+            with open(abs_path, "r", encoding="utf-8") as f:
+                raw = f.read()
+        except UnicodeDecodeError:
+            with open(abs_path, "r", encoding="utf-16") as f:
+                raw = f.read()
         norm = norm_line_endings(raw)
         files.append(SourceFile(rel_path=rel, raw=norm, lines=norm.split("\n")))
     return files
@@ -799,50 +804,37 @@ def check_buff_arity(idx: Index) -> list:
 
 
 def check_hud_linkage(idx: Index) -> list:
-    """F. HUD-связность баффов (эвристика по префиксам имён).
-
-    Группируем BuffId по префиксу до первого '_' (либо само имя, если без '_').
-    Если в группе есть add_buff — в ней должен быть и add_hud_buff (CODESTYLE §5.11).
-    Это эвристика по именованию, а не формальная гарантия.
+    """F. HUD-связность баффов (проверка макросов).
+    
+    Для каждого BuffId.X, используемого через trackBuff, но ни разу через applyVisibleDebuff → 
+    WARN («trackBuff без HUD; если эффект видимый — нужен applyVisibleDebuff...»).
     """
     findings = []
-    if "BuffId" not in idx.enums:
-        return findings
-    all_members = idx.enums["BuffId"].members
-
-    # множества BuffId, которые фигурируют в add_buff vs add_hud_buff контексте.
-    # поскольку контекст передачи — это buff_append_args, а сам id стоит в массиве,
-    # упрощённо: считаем «add_buff-id» те BuffId.X, что встречаются в файлах,
-    # где есть add_buff, и аналогично для hud. Более точно — по принадлежности
-    # к группе, где встречается add_buff/add_hud_buff. Делаем группировку по группам.
-    groups = {}  # group -> set(members)
-    for m in all_members:
-        key = m.split("_")[0] if "_" in m else m
-        groups.setdefault(key, set()).add(m)
-
-    # какие BuffId реально задействованы вообще
-    used = idx.enum_refs.get("BuffId", set())
-
-    for group, members in groups.items():
-        active_members = members & used
-        if not active_members:
-            continue  # вся группа не используется — не наша забота (orphan чек ловит)
-        # есть ли в проекте add_hud_buff вообще для этой группы?
-        # определяем по наличию add_hud_buff и add_buff в коде +组成员ам used
-        # Простой подход: группа «нуждается в HUD», если среди её использованных
-        # членов есть такие, что хотя бы один должен отображаться. Эвристика:
-        # если в группе есть использованные члены, требуем хотя бы одного
-        # использованного члена, который встречается в файле, содержащем add_hud_buff.
-        # Поскольку точное сопоставление строк затруднено, используем смягчённый
-        # эвристический сигнал: если в группе НЕТ ни одного члена, упоминаемого
-        # в районе add_hud_buff-вызовов, но есть члены у add_buff — WARN.
-        # В v1 этот чек мягкий: пропускаем, если в коде есть add_hud_buff хотя бы раз.
-        pass
-
-    # В v1 реализуем безопасную мягкую версию: ничего не flagged, если в проекте
-    # есть add_hud_buff. Чек активируется (WARN) только при явном дисбалансе,
-    # который мы можем определить надёжно. Полная версия вынесена в README как TODO.
-    # Это предохраняет от ложных срабатываний на текущем коде.
+    
+    track_re = re.compile(r"trackBuff\(\s*BuffId\.([A-Z_0-9]+)")
+    apply_re = re.compile(r"applyVisibleDebuff\(\s*BuffId\.([A-Z_0-9]+)")
+    
+    track_buffs = {}
+    apply_buffs = set()
+    
+    rel_paths = discover_files()
+    files = load_files(rel_paths)
+    
+    for sf in files:
+        for lineno, line in enumerate(sf.lines, start=1):
+            code = strip_inline_comment(line)
+            for m in track_re.finditer(code):
+                buff_id = m.group(1)
+                if buff_id not in track_buffs:
+                    track_buffs[buff_id] = (sf.rel_path, lineno)
+            for m in apply_re.finditer(code):
+                apply_buffs.add(m.group(1))
+                
+    for buff_id, (rel, line) in track_buffs.items():
+        if buff_id not in apply_buffs:
+            findings.append(Finding("WARN", rel, line,
+                f"trackBuff(BuffId.{buff_id}) используется без applyVisibleDebuff. Если эффект должен быть виден в HUD, используйте applyVisibleDebuff, иначе нарушается BUILD.md золотое правило #2 (для намеренно невидимых эффектов игнорируйте этот варнинг)."))
+                
     return findings
 
 
@@ -965,6 +957,73 @@ def check_loop_safety(idx: Index) -> list:
                 i += 1
     return findings
 
+
+def check_extend_buff_duplicates(idx: Index) -> list:
+    """K. Запрет extendBuff для дублируемых BuffId."""
+    findings = []
+    duplicatable_buffs = set()
+    edef = idx.enums.get("BuffId")
+    if edef:
+        abs_path = os.path.join(PROJECT_ROOT, edef.rel_path)
+        if os.path.isfile(abs_path):
+            with open(abs_path, "r", encoding="utf-8") as f:
+                lines = norm_line_endings(f.read()).split("\n")
+            for member in edef.members:
+                line_idx = edef.member_lines[edef.members.index(member)] - 1
+                if line_idx < len(lines) and "DUPLICATABLE" in lines[line_idx].upper():
+                    duplicatable_buffs.add(member)
+    
+    if not duplicatable_buffs:
+        return findings
+        
+    extend_re = re.compile(r"\bextendBuff\s*\(\s*BuffId\.([A-Z_0-9]+)")
+    
+    rel_paths = discover_files()
+    files = load_files(rel_paths)
+    for sf in files:
+        for lineno, line in enumerate(sf.lines, start=1):
+            code = strip_inline_comment(line)
+            for m in extend_re.finditer(code):
+                buff_id = m.group(1)
+                if buff_id in duplicatable_buffs:
+                    findings.append(Finding("ERROR", sf.rel_path, lineno,
+                        f"Использование макроса extendBuff для дублируемого BuffId.{buff_id} запрещено. Используйте extendBuffAll, так как .index() ломает продление для дубликатов."))
+                        
+    return findings
+def check_builder_api_safety(idx: Index) -> list:
+    """L. Безопасность Builder API (setLast...Flag)."""
+    findings = []
+    builder_re = re.compile(r"\b(setLastBuffFlag|setLastHudFlag|setLastVisibleFlag)\b")
+    creator_re = re.compile(r"\b(trackBuff|trackHud|applyVisibleDebuff|trackAttackerBuff|trackAttackerHud|applyVisibleAttackerDebuff)\b")
+    
+    rel_paths = discover_files()
+    files = load_files(rel_paths)
+    for sf in files:
+        if sf.rel_path in BUFF_API_FILES:
+            continue
+            
+        n = len(sf.lines)
+        for i in range(n):
+            code = strip_inline_comment(sf.lines[i])
+            if builder_re.search(code):
+                # Нашли вызов билдера, ищем предыдущую значащую строку
+                prev_idx = i - 1
+                found_creator = False
+                while prev_idx >= 0:
+                    prev_code = strip_inline_comment(sf.lines[prev_idx]).strip()
+                    if prev_code == "" or prev_code.startswith("#"):
+                        prev_idx -= 1
+                        continue
+                    if creator_re.search(prev_code):
+                        found_creator = True
+                    break
+                    
+                if not found_creator:
+                    findings.append(Finding("ERROR", sf.rel_path, i + 1,
+                        "Вызов модификатора setLast...Flag оторван от создания баффа! Это может привести к порче чужого флага. Вызывайте его строго на следующей строке после trackBuff/applyVisibleDebuff."))
+                        
+    return findings
+
 # --- Реестр и раннер ---------------------------------------------------------
 
 CHECKS = [
@@ -979,6 +1038,8 @@ CHECKS = [
     ("H. Устаревшие статы", check_legacy_stat_vars),
     ("I. Устаревший API", check_legacy_api),
     ("J. Безопасность циклов", check_loop_safety),
+    ("K. Дублируемые BuffId", check_extend_buff_duplicates),
+    ("L. Безопасность Builder API", check_builder_api_safety),
 ]
 
 

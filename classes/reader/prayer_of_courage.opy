@@ -63,25 +63,31 @@ rule "Reader Ability: prayer of courage":
             eventPlayer.extendBuff(BuffId.COURAGE_DAMAGE, getTotalTimeElapsed() + eventPlayer.courageDuration)
             eventPlayer.extendBuff(BuffId.COURAGE_ACTIVE_FLAG, getTotalTimeElapsed() + eventPlayer.courageDuration)
             
-            #create active flag if not exists
-            if eventPlayer.courageIsActive == false:
+            # On FIRST stack: create singletons
+            if eventPlayer.courageStacks == 0:
+                createEffect(getAllPlayers(), Effect.TORBJORN_OVERLOADING, Color.ORANGE, eventPlayer, 200, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
+                wait()
+                eventPlayer.trackBuff(BuffId.COURAGE_VISUAL, getLastCreatedEntity(), getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.ENTITY, 0, 0)
+                
                 eventPlayer.applyVisibleDebuff(BuffId.COURAGE_ACTIVE_FLAG, eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.PLAYER_VARIABLE, EffectAction.EXISTENCE_PRAYER_OF_COURAGE, 0, "{0} Prayer of Courage".format(iconString(Icon.FIRE)), Color.YELLOW)
+                
+                eventPlayer.courageIsActive = true
 
             #if stacks not exceeded max (2 + tier)
             if eventPlayer.courageStacks < (2 + eventPlayer.current_tier):
                 eventPlayer.courageStacks++
                 smallMessage(eventPlayer, "courage stack added: {0}".format(eventPlayer.courageStacks))
                 
-                #add damage
+                #add damage (stat aggregation)
                 eventPlayer.courageDamageBonus = evalOnce((eventPlayer.base_stat_damage + eventPlayer.mod_stat_damage) * 0.1)
-                eventPlayer.trackBuff(BuffId.COURAGE_DAMAGE, eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.DAMAGE, EffectAction.MODIFY_STAT, eventPlayer.courageDamageBonus)
+                
+                if BuffId.COURAGE_DAMAGE in eventPlayer.active_buff_ids:
+                    eventPlayer.active_buff_values[eventPlayer.active_buff_ids.index(BuffId.COURAGE_DAMAGE)] += eventPlayer.courageDamageBonus
+                    eventPlayer.mod_stats[EffectType.DAMAGE] += eventPlayer.courageDamageBonus
+                    eventPlayer.apply_all_stats()
+                else:
+                    eventPlayer.trackBuff(BuffId.COURAGE_DAMAGE, eventPlayer, getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.DAMAGE, EffectAction.MODIFY_STAT, eventPlayer.courageDamageBonus)
             else:
                 smallMessage(eventPlayer, "max prayer stacks reached. duration extended.")
                 
-            #create visual buff if not exists (checked via active flag)
-            if eventPlayer.courageIsActive == false:
-                createEffect(getAllPlayers(), Effect.TORBJORN_OVERLOADING, Color.ORANGE, eventPlayer, 200, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-                wait()
-                eventPlayer.trackBuff(BuffId.COURAGE_VISUAL, getLastCreatedEntity(), getTotalTimeElapsed() + eventPlayer.courageDuration, EffectType.ENTITY, 0, 0)
-                eventPlayer.courageIsActive = true
     eventPlayer.courageProgress = 0

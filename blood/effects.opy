@@ -5,7 +5,7 @@ rule "Blood texts and rings":
     wait(3)
     #Seppuku
     createInWorldText(getAllPlayers(), "SEPPUKU (reset lvl & stats)\r\n   give you blood points." if localPlayer.current_zone == Zone.BUBBLE else " ", vect(seppuku_pos.x, seppuku_pos.y + 1.55, seppuku_pos.z), 2, Clip.SURFACES, WorldTextReeval.STRING, Color.RED, SpecVisibility.ALWAYS)
-    createInWorldText(getAllPlayers(), "level to next seppuku: {0}\r\ncurrent seppuku level: {1}".format(localPlayer.level_to_seppuku, localPlayer.seppuku_level) if localPlayer.current_zone == Zone.BUBBLE and distance(localPlayer.getPosition(), vect(132.2, 64.3, -170.147)) <= 6 else " ", vect(132.2, 64.6, -170.147), 1.75, Clip.SURFACES, WorldTextReeval.STRING, Color.ORANGE)
+    createInWorldText(getAllPlayers(), "level to next seppuku: {0}\r\ncurrent seppuku level: {1}".format(localPlayer.level_to_seppuku, localPlayer.seppuku_level) if localPlayer.current_zone == Zone.BUBBLE and distance(localPlayer.getPosition(), seppuku_pos) <= 6 else " ", vect(seppuku_pos.x, seppuku_pos.y + 1.6, seppuku_pos.z), 1.75, Clip.SURFACES, WorldTextReeval.STRING, Color.ORANGE)
     #blood shop spawn text
     createInWorldText(getAllPlayers(), "BLOOD SHOP" if localPlayer.current_zone == Zone.BUBBLE else " ", vect(136.408, 66, -170.686), 2.25, Clip.SURFACES, WorldTextReeval.STRING, Color.RED)
     createInWorldText(getAllPlayers(), "CURRENT BLOOD: {0}".format(localPlayer.blood_points) if localPlayer.current_zone == Zone.BLOOD_SHOP else " ", vect(136.112, 65.5, -173.297), 2, Clip.SURFACES, WorldTextReeval.STRING, Color.RED)

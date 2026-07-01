@@ -175,24 +175,35 @@ rule "Test 5D Array Mechanics":
     
 
 
+rule "Debug: Init FCT for player":
+    @Event eachPlayer
+    
+    # [damage, start_time, unused, drift_vector]
+    eventPlayer.fct_data = [0, -10, vect(0,0,0), vect(0,0,0)]
+    
+    createInWorldText(
+        getAllPlayers() if getTotalTimeElapsed() - eventPlayer.fct_data[1] < 1.5 else [],
+        "{0}".format(round(eventPlayer.fct_data[0])),
+        updateEveryFrame(
+            eventPlayer + 
+            eventPlayer.fct_data[3] * (getTotalTimeElapsed() - eventPlayer.fct_data[1]) + 
+            vect(0, 1.8 + (getTotalTimeElapsed() - eventPlayer.fct_data[1]) * 1.5, 0)
+        ),
+        2.5,
+        Clip.SURFACES,
+        WorldTextReeval.VISIBILITY_POSITION_AND_STRING,
+        Color.LIGHT_RED,
+        SpecVisibility.DEFAULT
+    )
+
+
 rule "Debug: Floating Damage Numbers":
     @Event playerTookDamage
     
-    # Create the text
-    createInWorldText(getAllPlayers(), round(eventDamage), eventPlayer.getEyePosition() + vect(random.uniform(-0.5, 0.5), random.uniform(0.5, 1), random.uniform(-0.5, 0.5)), 2, Clip.NONE, WorldTextReeval.NONE, Color.RED, SpecVisibility.DEFAULT)
-    # Queue for deletion
-    eventPlayer.test_arr_1.append(getLastCreatedText())
-    eventPlayer.test_arr_2.append(getTotalTimeElapsed() + 1.5)
-    
-rule "Debug: Destroy Floating Damage Numbers":
-    @Event eachPlayer
-    @Condition len(eventPlayer.test_arr_1) > 0
-    
-    if getTotalTimeElapsed() >= eventPlayer.test_arr_2[0]:
-        destroyInWorldText(eventPlayer.test_arr_1[0])
-        del eventPlayer.test_arr_1[0]
-        del eventPlayer.test_arr_2[0]
-    wait(0.1)
-    if len(eventPlayer.test_arr_1) > 0:
-        loop()
+    eventPlayer.fct_data = [
+        eventDamage,
+        getTotalTimeElapsed(),
+        vect(0,0,0),
+        vect(random.uniform(-0.5, 0.5), random.uniform(0.2, 0.5), random.uniform(-0.5, 0.5))
+    ]
 

@@ -24,7 +24,10 @@ rule "Ability Bleeding":
             victim.bleed_effect_ids[eventPlayer.getSlot()] = getLastCreatedEntity()
             playEffect(getAllPlayers(), DynamicEffect.BAD_EXPLOSION, Color.RED, victim, 1)
             
-            victim.trackHud(BuffId.BLEEDING, getTotalTimeElapsed() + eventPlayer.bleedingDuration, "{0} Bleeding".format(iconString(Icon.HEART)), Color.RED)
+            if BuffId.BLEEDING not in victim.hud_buff_ids:
+                victim.trackHud(BuffId.BLEEDING, getTotalTimeElapsed() + eventPlayer.bleedingDuration, "{0} Bleeding".format(iconString(Icon.HEART)), Color.RED)
+            else:
+                victim.extendBuff(BuffId.BLEEDING, getTotalTimeElapsed() + eventPlayer.bleedingDuration)
         else:
             victim.extendBuff(BuffId.BLEEDING, getTotalTimeElapsed() + eventPlayer.bleedingDuration)
 
@@ -34,9 +37,9 @@ rule "Process Bleeding DoT":
     @Condition len(eventPlayer.bleed_expire_times.filter(lambda x: x > getTotalTimeElapsed())) > 0
     
     eventPlayer.isReceivingBleedDamage = true
-    for eventPlayer.temp_var_2 in range(12):
-        if eventPlayer.bleed_expire_times[eventPlayer.temp_var_2] > getTotalTimeElapsed():
-            damage(eventPlayer, getPlayersInSlot(eventPlayer.temp_var_2), eventPlayer.bleed_tick_damages[eventPlayer.temp_var_2])
+    for eventPlayer.bleed_dot_iter in range(12):
+        if eventPlayer.bleed_expire_times[eventPlayer.bleed_dot_iter] > getTotalTimeElapsed():
+            damage(eventPlayer, getPlayersInSlot(eventPlayer.bleed_dot_iter), eventPlayer.bleed_tick_damages[eventPlayer.bleed_dot_iter])
             wait(0.1)
             
     eventPlayer.isReceivingBleedDamage = false
@@ -49,11 +52,11 @@ rule "Expire Bleeding Effects":
     @Event eachPlayer
     @Condition len(eventPlayer.bleed_effect_ids.filter(lambda x: x != null and x != 0)) > 0
     
-    for eventPlayer.temp_var_2 in range(12):
-        if eventPlayer.bleed_effect_ids[eventPlayer.temp_var_2] != null and eventPlayer.bleed_effect_ids[eventPlayer.temp_var_2] != 0:
-            if eventPlayer.bleed_expire_times[eventPlayer.temp_var_2] <= getTotalTimeElapsed():
-                destroyEffect(eventPlayer.bleed_effect_ids[eventPlayer.temp_var_2])
-                eventPlayer.bleed_effect_ids[eventPlayer.temp_var_2] = null
+    for eventPlayer.bleed_expire_iter in range(12):
+        if eventPlayer.bleed_effect_ids[eventPlayer.bleed_expire_iter] != null and eventPlayer.bleed_effect_ids[eventPlayer.bleed_expire_iter] != 0:
+            if eventPlayer.bleed_expire_times[eventPlayer.bleed_expire_iter] <= getTotalTimeElapsed():
+                destroyEffect(eventPlayer.bleed_effect_ids[eventPlayer.bleed_expire_iter])
+                eventPlayer.bleed_effect_ids[eventPlayer.bleed_expire_iter] = null
         wait(0.016)
         
     wait(1)
@@ -65,11 +68,11 @@ rule "Clear Bleeding on Death or Spawn":
     @Event eachPlayer
     @Condition (eventPlayer.isAlive() == false) or (eventPlayer.current_zone == Zone.BUBBLE)
     
-    for eventPlayer.temp_var_2 in range(12):
-        eventPlayer.bleed_expire_times[eventPlayer.temp_var_2] = 0
-        if eventPlayer.bleed_effect_ids[eventPlayer.temp_var_2] != null and eventPlayer.bleed_effect_ids[eventPlayer.temp_var_2] != 0:
-            destroyEffect(eventPlayer.bleed_effect_ids[eventPlayer.temp_var_2])
-            eventPlayer.bleed_effect_ids[eventPlayer.temp_var_2] = null
+    for eventPlayer.bleed_clear_iter in range(12):
+        eventPlayer.bleed_expire_times[eventPlayer.bleed_clear_iter] = 0
+        if eventPlayer.bleed_effect_ids[eventPlayer.bleed_clear_iter] != null and eventPlayer.bleed_effect_ids[eventPlayer.bleed_clear_iter] != 0:
+            destroyEffect(eventPlayer.bleed_effect_ids[eventPlayer.bleed_clear_iter])
+            eventPlayer.bleed_effect_ids[eventPlayer.bleed_clear_iter] = null
             
     if BuffId.BLEEDING in eventPlayer.hud_buff_ids:
         eventPlayer.extendBuff(BuffId.BLEEDING, 0)

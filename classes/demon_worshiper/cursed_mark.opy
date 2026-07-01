@@ -5,56 +5,60 @@ rule "Demon Worshiper: Apply Cursed Mark Stack":
     @Condition eventPlayer.altar_status == AltarStatus.DEMON_WORSHIPER
     @Condition eventDamage > 0
     
-    # Accumulate damage dealt to this victim
-    victim.cursedMarkDamagePool += eventDamage
+    # Accumulate damage dealt to this victim per attacker
+    victim.cursedMarkDamagePool[eventPlayer.getSlot()] += eventDamage
     
     # Check if accumulated damage exceeds dynamic threshold
-    if victim.cursedMarkDamagePool >= (eventPlayer.dwCurseBaseThreshold * ((eventPlayer.base_stat_damage + eventPlayer.mod_stat_damage) / 100)):
+    if victim.cursedMarkDamagePool[eventPlayer.getSlot()] >= (eventPlayer.dwCurseBaseThreshold * ((eventPlayer.base_stat_damage + eventPlayer.mod_stat_damage) / 100)):
         # Reset damage pool
-        victim.cursedMarkDamagePool = 0
+        victim.cursedMarkDamagePool[eventPlayer.getSlot()] = 0
         
-        # Create a visual effect if this is the first stack (Using HACKED status effect for corruption visuals)
-        if victim.cursedMarkStacks == 0:
+        # Create a visual effect if this is the first stack for THIS attacker
+        if victim.cursedMarkStacks[eventPlayer.getSlot()] == 0:
             createEffect(getAllPlayers(), Effect.SOMBRA_HACKED_LOOPING, Color.PURPLE, victim, 1, EffectReeval.VISIBILITY_POSITION_AND_RADIUS)
-            victim.cursedMarkEffectId = getLastCreatedEntity()
+            victim.cursedMarkVisualIds[eventPlayer.getSlot()] = getLastCreatedEntity()
             playEffect(getAllPlayers(), DynamicEffect.ANA_BIOTIC_GRENADE_EXPLOSION, Color.PURPLE, victim, 2)
             
-            # Register visual effect to global system on the victim and HUD
-            victim.applyVisibleDebuff(BuffId.CURSED_MARK_VISUAL, victim.cursedMarkEffectId, getTotalTimeElapsed() + eventPlayer.dwCurseDuration, EffectType.ENTITY, 0, 0, "{0} Cursed Mark".format(iconString(Icon.SKULL)), Color.PURPLE)
+            # Register visual effect to global system on the victim AND attacker-specific HUD
+            victim.applyVisibleAttackerDebuff(BuffId.CURSED_MARK_VISUAL, eventPlayer, victim.cursedMarkVisualIds[eventPlayer.getSlot()], getTotalTimeElapsed() + eventPlayer.dwCurseDuration, EffectType.ENTITY, 0, 0, "{0} Cursed Mark".format(iconString(Icon.SKULL)), Color.PURPLE)
         
-        # Add stack (max 3)
-        if victim.cursedMarkStacks < 3:
-            victim.cursedMarkStacks++
+        # Add stack (max 3 per attacker)
+        if victim.cursedMarkStacks[eventPlayer.getSlot()] < 3:
+            victim.cursedMarkStacks[eventPlayer.getSlot()] += 1
             
             # Increase damage received and register/update stat buff to global system
-            if victim.cursedMarkStacks == 1:
+            if victim.cursedMarkStacks[eventPlayer.getSlot()] == 1:
                 # Register new stat buff
-                victim.trackBuff(BuffId.CURSED_MARK_STAT, victim, getTotalTimeElapsed() + eventPlayer.dwCurseDuration, EffectType.DAMAGE_RECEIVED, EffectAction.MODIFY_STAT, eventPlayer.dwCurseDamageBonus)
+                victim.trackAttackerBuff(BuffId.CURSED_MARK_STAT, eventPlayer, victim, getTotalTimeElapsed() + eventPlayer.dwCurseDuration, EffectType.DAMAGE_RECEIVED, EffectAction.MODIFY_STAT, eventPlayer.dwCurseDamageBonus)
             else:
                 # Update existing stat buff value
-                victim.active_buff_values[victim.active_buff_ids.index(BuffId.CURSED_MARK_STAT)] += eventPlayer.dwCurseDamageBonus
+                victim.addAttackerBuffValue(BuffId.CURSED_MARK_STAT, eventPlayer, eventPlayer.dwCurseDamageBonus)
                 victim.mod_stat_damage_received += eventPlayer.dwCurseDamageBonus
                 victim.apply_all_stats()
             
         # Set/refresh expiration timestamp
-        victim.cursedMarkExpire = getTotalTimeElapsed() + eventPlayer.dwCurseDuration
+        victim.cursedMarkExpireTimes[eventPlayer.getSlot()] = getTotalTimeElapsed() + eventPlayer.dwCurseDuration
         
         # Extend Buffs
-        victim.extendBuff(BuffId.CURSED_MARK_VISUAL, victim.cursedMarkExpire)
-        victim.extendBuff(BuffId.CURSED_MARK_STAT, victim.cursedMarkExpire)
+        victim.extendAttackerBuff(BuffId.CURSED_MARK_VISUAL, eventPlayer, victim.cursedMarkExpireTimes[eventPlayer.getSlot()])
+        victim.extendAttackerBuff(BuffId.CURSED_MARK_STAT, eventPlayer, victim.cursedMarkExpireTimes[eventPlayer.getSlot()])
         
         # Audio feedback for stack refresh
         playEffect(getAllPlayers(), DynamicEffect.DEBUFF_IMPACT_SOUND, Color.WHITE, victim, 100)
 
 rule "Demon Worshiper: Expire Cursed Mark":
     @Event eachPlayer
-    @Condition eventPlayer.cursedMarkStacks > 0
-    @Condition getTotalTimeElapsed() > eventPlayer.cursedMarkExpire
     
-    # Reset stacks and damage pool
-    eventPlayer.cursedMarkStacks = 0
-    eventPlayer.cursedMarkDamagePool = 0
+    # Process expirations per attacker
+    for eventPlayer.dw_iter in range(12):
+        if eventPlayer.cursedMarkStacks[eventPlayer.dw_iter] > 0:
+            if getTotalTimeElapsed() > eventPlayer.cursedMarkExpireTimes[eventPlayer.dw_iter]:
+                # Reset stacks and damage pool for this attacker
+                eventPlayer.cursedMarkStacks[eventPlayer.dw_iter] = 0
+                eventPlayer.cursedMarkDamagePool[eventPlayer.dw_iter] = 0
+                eventPlayer.cursedMarkVisualIds[eventPlayer.dw_iter] = null
     
-    # Visual cleanup is handled by effects_lifecycle.opy (EffectType.ENTITY)
-    # Stat cleanup is handled by effects_lifecycle.opy (EffectType.DAMAGE_RECEIVED)
-    eventPlayer.cursedMarkEffectId = null
+    wait(0.2)
+    if ruleCondition:
+        loop()
+

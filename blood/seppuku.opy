@@ -23,9 +23,9 @@ rule "Shop seppuku":
         eventPlayer.gold = 0
         eventPlayer.xp = 0
         #Upgrade stats limits
-        eventPlayer.stats_limit[0] += 100
-        eventPlayer.stats_limit[1] += 100
-        eventPlayer.stats_limit[2] += 10
+        eventPlayer.statLimitHealth += 100
+        eventPlayer.statLimitDamage += 100
+        eventPlayer.statLimitSpeed += 10
         #update stats
         eventPlayer.apply_all_stats()
         eventPlayer.setScore(eventPlayer.level)

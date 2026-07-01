@@ -21,9 +21,20 @@ rule "Remove negative effects after death":
     @Event playerDied
     
     eventPlayer.stopAllDamageOverTime()
-    # Force all active buffs to expire immediately so lifecycle loop cleans them up and reverts stats safely
-    eventPlayer.active_buff_expire_times = [0 for x in eventPlayer.active_buff_expire_times]
-    eventPlayer.hud_buff_expires = [0 for x in eventPlayer.hud_buff_expires]
+    # Force active buffs to expire immediately so lifecycle loop cleans them up, unless they are PERSIST_ON_DEATH
+    for eventPlayer.temp_var_0 in range(len(eventPlayer.active_buff_ids)):
+        if eventPlayer.active_buff_flags[eventPlayer.temp_var_0] != BuffFlag.PERSIST_ON_DEATH:
+            eventPlayer.active_buff_expire_times[eventPlayer.temp_var_0] = 0
+            
+    for eventPlayer.temp_var_0 in range(len(eventPlayer.hud_buff_ids)):
+        if eventPlayer.hud_buff_flags[eventPlayer.temp_var_0] != BuffFlag.PERSIST_ON_DEATH:
+            eventPlayer.hud_buff_expires[eventPlayer.temp_var_0] = 0
+    
+    # Clear per-attacker passive states
+    eventPlayer.cursedMarkStacks = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    eventPlayer.cursedMarkDamagePool = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    eventPlayer.cursedMarkExpireTimes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    eventPlayer.cursedMarkVisualIds = [null, null, null, null, null, null, null, null, null, null, null, null]
 
 
 

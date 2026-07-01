@@ -19,39 +19,24 @@ rule "Init":
 
 
 
-rule "Player Init":
-    @Event eachPlayer
-    @Condition eventPlayer.hasSpawned() == true
-    @Condition eventPlayer.player_init == false
-    @Condition eventPlayer.isDummy() == false
+def init_common_player_fields():
+    @Name "Sub: init common player fields"
     
-    eventPlayer.teleport(respawn_point)
-    #STATS limit: health, damage, speed
     eventPlayer.stats_limit = [500, 500, 125]
-    #stats init
     eventPlayer.base_stats = [0, 0, 0, 0, 100, 100, 100, 100, 100, 100]
     eventPlayer.mod_stats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    #passives init: [VAMP_PASSIVE, VAMP_SIZE, VAMP_LEVEL, BLEED_PASSIVE, BLEED_CHANCE, BLEED_CD, BLEED_DURATION, BLEED_POWER, BLEED_CHANCE_PLAYER, BLEED_LEVEL, CURSED_MARK_STACKS, CURSED_MARK_EXPIRE, CURSED_MARK_DAMAGE_POOL, CURSED_MARK_EFFECT_ID, IS_RECEIVING_BLEED_DAMAGE]
-    eventPlayer.passives_data = [false, 0, 0, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false]
-    #currency
+    eventPlayer.passives_data = [false, 0, 0, false, 0, 0, 0, 0, 0, 0, false]
     eventPlayer.level_up_points = 100
-    #xp mining init
     eventPlayer.xp_multi = 1
-    #race init [race_name, race_text_size, race_text_color]
     eventPlayer.current_race = ["Human", 2, rgb(180, 190, 185), getAllPlayers()]
     eventPlayer.current_tier = 1
-    create_status_text()
-    #seppuku init
     eventPlayer.seppuku_level = 3
     eventPlayer.level_to_seppuku = 40
-    #blood upgrades cost
     eventPlayer.blood_xp_cost = 5
     eventPlayer.bleeding_cost = 10
     eventPlayer.vampire_cost = 10
-    #altar rings initiate
     eventPlayer.altar_left_1_ring = [rgb(0, 0, 0), false]
     eventPlayer.altar_left_2_ring = [rgb(0, 0, 0), false]
-    #player init = true
     eventPlayer.current_zone = Zone.NONE
     eventPlayer.active_buff_ids = []
     eventPlayer.active_buff_targets = []
@@ -59,8 +44,30 @@ rule "Player Init":
     eventPlayer.active_buff_types = []
     eventPlayer.active_buff_actions = []
     eventPlayer.active_buff_values = []
+    eventPlayer.active_buff_sources = []
+    eventPlayer.active_buff_flags = []
+    eventPlayer.hud_buff_sources = []
+    eventPlayer.hud_buff_flags = []
+    eventPlayer.hud_buff_ids = []
+    eventPlayer.hud_buff_names = []
+    eventPlayer.hud_buff_expires = []
+    eventPlayer.hud_buff_colors = []
+    eventPlayer.cursedMarkStacks = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    eventPlayer.cursedMarkDamagePool = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    eventPlayer.cursedMarkExpireTimes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    eventPlayer.cursedMarkVisualIds = [null, null, null, null, null, null, null, null, null, null, null, null]
     eventPlayer.gc_ids = []
     eventPlayer.gc_types = []
+
+rule "Player Init":
+    @Event eachPlayer
+    @Condition eventPlayer.hasSpawned() == true
+    @Condition eventPlayer.player_init == false
+    @Condition eventPlayer.isDummy() == false
+    
+    eventPlayer.teleport(respawn_point)
+    init_common_player_fields()
+    create_status_text()
     eventPlayer.player_init = true
 
 
@@ -141,47 +148,7 @@ rule "Init Dummy Bot for Testing":
     @Condition eventPlayer.hasSpawned() == true
     @Condition eventPlayer.player_init == false
     
-    # Stats init
-    eventPlayer.stats_limit = [500, 500, 125]
-    eventPlayer.base_stats = [0, 0, 0, 0, 100, 100, 100, 100, 100, 100]
-    eventPlayer.mod_stats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
-    # Passives init (нужно до чтения cursedMarkStacks ниже): см. enum PassivesData
-    eventPlayer.passives_data = [false, 0, 0, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false]
-    
-    # Currency and leveling
-    eventPlayer.level_up_points = 100
-    eventPlayer.xp_multi = 1
-    eventPlayer.current_tier = 1
-    
-    # Race init [race_name, race_text_size, race_text_color]
-    eventPlayer.current_race = ["Human", 2, rgb(180, 190, 185), getAllPlayers()]
-    
-    # Seppuku init
-    eventPlayer.seppuku_level = 3
-    eventPlayer.level_to_seppuku = 40
-    
-    # Blood upgrades cost
-    eventPlayer.blood_xp_cost = 5
-    eventPlayer.bleeding_cost = 10
-    eventPlayer.vampire_cost = 10
-    
-    # Altar rings initiate
-    eventPlayer.altar_left_1_ring = [rgb(0, 0, 0), false]
-    eventPlayer.altar_left_2_ring = [rgb(0, 0, 0), false]
-    
-    # Zone
-    eventPlayer.current_zone = Zone.NONE
-
-    # Buff arrays init
-    eventPlayer.active_buff_ids = []
-    eventPlayer.active_buff_targets = []
-    eventPlayer.active_buff_expire_times = []
-    eventPlayer.active_buff_types = []
-    eventPlayer.active_buff_actions = []
-    eventPlayer.active_buff_values = []
-    eventPlayer.gc_ids = []
-    eventPlayer.gc_types = []
+    init_common_player_fields()
     
     wait(1, Wait.IGNORE_CONDITION)
     createInWorldText(getAllPlayers(), "Dummy{0}".format(" {0} x{1}".format(iconString(Icon.SKULL), eventPlayer.cursedMarkStacks) if eventPlayer.cursedMarkStacks > 0 else ""), eventPlayer, 2, Clip.SURFACES, WorldTextReeval.VISIBILITY_STRING_AND_COLOR, Color.WHITE)

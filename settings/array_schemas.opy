@@ -9,6 +9,19 @@ enum AltarRaceText:
     TITLE_COLOR,
     DESC_COLOR
 
+enum AltarRing:
+    COLOR = 0,
+    VISIBLE
+
+enum AltarDescVisibility:
+    TITLE = 0,
+    DESCRIPTION
+
+macro Player.descriptionVisibility = self.description_visibility_status
+macro Player.altarLeft1RingColor = self.altar_left_1_ring[AltarRing.COLOR]
+macro Player.altarLeft1RingVisible = self.altar_left_1_ring[AltarRing.VISIBLE]
+macro Player.altarRight1RingColor = self.altar_right_1_ring[AltarRing.COLOR]
+macro Player.altarRight1RingVisible = self.altar_right_1_ring[AltarRing.VISIBLE]
 # ============================================================
 # СХЕМЫ МАССИВОВ — BRANCH DATA
 # ============================================================
@@ -97,10 +110,6 @@ enum PassivesData:
     BLEED_POWER,
     BLEED_CHANCE_PLAYER,
     BLEED_LEVEL,
-    CURSED_MARK_STACKS,
-    CURSED_MARK_EXPIRE,
-    CURSED_MARK_DAMAGE_POOL,
-    CURSED_MARK_EFFECT_ID,
     IS_RECEIVING_BLEED_DAMAGE
 
 macro Player.passiveVampire = self.passives_data[PassivesData.VAMP_PASSIVE]
@@ -125,7 +134,13 @@ enum EffectEntry:
     EXPIRE_TIME,
     TYPE,
     ACTION,
-    VALUE
+    VALUE,
+    SOURCE,
+    FLAG
+
+enum BuffFlag:
+    NORMAL = 0,
+    PERSIST_ON_DEATH
 
 
 # ============================================================
@@ -142,13 +157,6 @@ macro Player.statLimitHealth = self.stats_limit[StatLimit.HEALTH]
 macro Player.statLimitDamage = self.stats_limit[StatLimit.DAMAGE]
 macro Player.statLimitSpeed = self.stats_limit[StatLimit.SPEED]
 
-# ============================================================
-# СХЕМЫ МАССИВОВ — DEMON WORSHIPER
-# ============================================================
-macro Player.cursedMarkStacks = self.passives_data[PassivesData.CURSED_MARK_STACKS]
-macro Player.cursedMarkExpire = self.passives_data[PassivesData.CURSED_MARK_EXPIRE]
-macro Player.cursedMarkDamagePool = self.passives_data[PassivesData.CURSED_MARK_DAMAGE_POOL]
-macro Player.cursedMarkEffectId = self.passives_data[PassivesData.CURSED_MARK_EFFECT_ID]
 
 enum DemonicBranchData:
     IS_ANGELIC_FLAG = 0, # Must be false for Demons to prevent unlocking Reader abilities
@@ -218,6 +226,8 @@ macro Player.trackBuff(buffId, target, expire, type, action, value):
     self.active_buff_types.append(type)
     self.active_buff_actions.append(action)
     self.active_buff_values.append(value)
+    self.active_buff_sources.append(null)
+    self.active_buff_flags.append(BuffFlag.NORMAL)
     if type >= EffectType.SPEED:
         self.mod_stats[type] += value
         self.apply_all_stats()
@@ -228,6 +238,8 @@ macro Player.trackHud(buffId, expire, name, color):
     self.hud_buff_expires.append(expire)
     self.hud_buff_names.append(name)
     self.hud_buff_colors.append(color)
+    self.hud_buff_sources.append(null)
+    self.hud_buff_flags.append(BuffFlag.NORMAL)
 
 # --- ВИДИМЫЙ дебафф/бафф: механика + HUD за ОДИН вызов ---
 # Используй ЭТО для любого эффекта, который игрок должен видеть. HUD физически
@@ -244,6 +256,10 @@ macro Player.applyVisibleDebuff(buffId, target, expire, type, action, value, nam
     self.hud_buff_expires.append(expire)
     self.hud_buff_names.append(name)
     self.hud_buff_colors.append(color)
+    self.active_buff_sources.append(null)
+    self.hud_buff_sources.append(null)
+    self.active_buff_flags.append(BuffFlag.NORMAL)
+    self.hud_buff_flags.append(BuffFlag.NORMAL)
     if type >= EffectType.SPEED:
         self.mod_stats[type] += value
         self.apply_all_stats()
@@ -256,8 +272,81 @@ macro Player.extendBuff(buffId, newExpire):
     if buffId in self.active_buff_ids:
         self.active_buff_expire_times[self.active_buff_ids.index(buffId)] = newExpire
 
+# --- Продление ВСЕХ стаков баффа по ID ---
+macro Player.extendBuffAll(buffId, newExpire):
+    for self.extend_all_buffs_iter in range(len(self.active_buff_ids)):
+        if self.active_buff_ids[self.extend_all_buffs_iter] == buffId:
+            self.active_buff_expire_times[self.extend_all_buffs_iter] = newExpire
 
 # --- Регистрация перманентного эффекта (Garbage Collector) ---
 macro Player.trackPersistentEntity(entity_id, gc_type):
     self.gc_ids.append(entity_id)
     self.gc_types.append(gc_type)
+
+# --- НОВЫЙ API ДЛЯ PER-ATTACKER БАФФОВ ---
+macro Player.trackAttackerBuff(buffId, source, target, expire, type, action, value):
+    self.active_buff_ids.append(buffId)
+    self.active_buff_targets.append(target)
+    self.active_buff_expire_times.append(expire)
+    self.active_buff_types.append(type)
+    self.active_buff_actions.append(action)
+    self.active_buff_values.append(value)
+    self.active_buff_sources.append(source)
+    self.active_buff_flags.append(BuffFlag.NORMAL)
+    if type >= EffectType.SPEED:
+        self.mod_stats[type] += value
+        self.apply_all_stats()
+
+macro Player.trackAttackerHud(buffId, source, expire, name, color):
+    self.hud_buff_ids.append(buffId)
+    self.hud_buff_expires.append(expire)
+    self.hud_buff_names.append(name)
+    self.hud_buff_colors.append(color)
+    self.hud_buff_sources.append(source)
+    self.hud_buff_flags.append(BuffFlag.NORMAL)
+
+macro Player.applyVisibleAttackerDebuff(buffId, source, target, expire, type, action, value, name, color):
+    self.active_buff_ids.append(buffId)
+    self.active_buff_targets.append(target)
+    self.active_buff_expire_times.append(expire)
+    self.active_buff_types.append(type)
+    self.active_buff_actions.append(action)
+    self.active_buff_values.append(value)
+    self.active_buff_sources.append(source)
+    self.hud_buff_ids.append(buffId)
+    self.hud_buff_expires.append(expire)
+    self.hud_buff_names.append(name)
+    self.hud_buff_colors.append(color)
+    self.hud_buff_sources.append(source)
+    self.active_buff_flags.append(BuffFlag.NORMAL)
+    self.hud_buff_flags.append(BuffFlag.NORMAL)
+    if type >= EffectType.SPEED:
+        self.mod_stats[type] += value
+        self.apply_all_stats()
+
+macro Player.extendAttackerBuff(buffId, source, newExpire):
+    for self.extend_attacker_iter in range(len(self.hud_buff_ids)):
+        if self.hud_buff_ids[self.extend_attacker_iter] == buffId and self.hud_buff_sources[self.extend_attacker_iter] == source:
+            self.hud_buff_expires[self.extend_attacker_iter] = newExpire
+    for self.extend_attacker_iter in range(len(self.active_buff_ids)):
+        if self.active_buff_ids[self.extend_attacker_iter] == buffId and self.active_buff_sources[self.extend_attacker_iter] == source:
+            self.active_buff_expire_times[self.extend_attacker_iter] = newExpire
+
+macro Player.addAttackerBuffValue(buffId, source, addValue):
+    for self.add_attacker_buff_iter in range(len(self.active_buff_ids)):
+        if self.active_buff_ids[self.add_attacker_buff_iter] == buffId and self.active_buff_sources[self.add_attacker_buff_iter] == source:
+            self.active_buff_values[self.add_attacker_buff_iter] += addValue
+
+# --- НОВЫЙ API МОДИФИКАТОРОВ (BUILDER PATTERN) ---
+# Использовать СРАЗУ ПОСЛЕ макросов trackBuff/applyVisibleDebuff, чтобы
+# изменить флаги (например, сделать бафф перманентным через BuffFlag.PERSIST_ON_DEATH).
+macro Player.setLastBuffFlag(flag):
+    self.active_buff_flags[len(self.active_buff_ids) - 1] = flag
+
+macro Player.setLastHudFlag(flag):
+    self.hud_buff_flags[len(self.hud_buff_ids) - 1] = flag
+
+macro Player.setLastVisibleFlag(flag):
+    self.active_buff_flags[len(self.active_buff_ids) - 1] = flag
+    self.hud_buff_flags[len(self.hud_buff_ids) - 1] = flag
+
